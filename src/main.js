@@ -1,26 +1,34 @@
+/*
+ * @Author: YanBenrong
+ * @LastEdit: YanBenrong
+ * @LastEditors: YanBenrong
+ * @Description:
+ * @params:
+ * @Date: 2023-03-07 14:13:58
+ * @LastEditTime: 2023-03-08 17:59:34
+ */
 /** init domain config */
 import './config'
 
 import Vue from 'vue'
+import Antd, { version } from 'ant-design-vue'
+
+import moment from 'moment'
+import 'moment/locale/zh-cn'
+
 import App from './App.vue'
 import Storage from 'vue-ls'
 import router from './router'
 import store from './store/'
-import { VueAxios } from "@/utils/request"
-
-require('@jeecg/antd-online-mini')
-require('@jeecg/antd-online-mini/dist/OnlineForm.css')
-
-import Antd, { version } from 'ant-design-vue'
-console.log('ant-design-vue version:', version)
+import { VueAxios } from '@/utils/request'
 
 import Viser from 'viser-vue'
-import 'ant-design-vue/dist/antd.less';  // or 'ant-design-vue/dist/antd.less'
+import 'ant-design-vue/dist/antd.less' // or 'ant-design-vue/dist/antd.less'
 
 import '@/permission' // permission control
 import '@/utils/filter' // base filter
 import Print from 'vue-print-nb-jeecg'
-/*import '@babel/polyfill'*/
+/* import '@babel/polyfill' */
 import preview from 'vue-photo-preview'
 import 'vue-photo-preview/dist/skin.css'
 import SSO from '@/cas/sso.js'
@@ -36,19 +44,25 @@ import {
   DEFAULT_FIXED_SIDEMENU,
   DEFAULT_CONTENT_WIDTH_TYPE,
   DEFAULT_MULTI_PAGE
-} from "@/store/mutation-types"
+} from '@/store/mutation-types'
 import config from '@/defaultSettings'
 
 import JDictSelectTag from './components/dict/index.js'
 import hasPermission from '@/utils/hasPermission'
-import vueBus from '@/utils/vueBus';
+import vueBus from '@/utils/vueBus'
 import JeecgComponents from '@/components/jeecg/index'
 import '@/assets/less/JAreaLinkage.less'
 import VueAreaLinkage from 'vue-area-linkage'
 import '@/components/jeecg/JVxeTable/install'
 import '@/components/JVxeCells/install'
-//表单验证
+import '@/assets/less/global.less'
+// 表单验证
 import { rules } from '@/utils/rules'
+
+moment.locale('zh-cn')
+
+require('@jeecg/antd-online-mini')
+require('@jeecg/antd-online-mini/dist/OnlineForm.css')
 Vue.prototype.rules = rules
 Vue.config.productionTip = false
 Vue.use(Storage, config.storageOptions)
@@ -59,9 +73,9 @@ Vue.use(hasPermission)
 Vue.use(JDictSelectTag)
 Vue.use(Print)
 Vue.use(preview)
-Vue.use(vueBus);
-Vue.use(JeecgComponents);
-Vue.use(VueAreaLinkage);
+Vue.use(vueBus)
+Vue.use(JeecgComponents)
+Vue.use(VueAreaLinkage)
 
 SSO.init(() => {
   main()
@@ -70,7 +84,7 @@ function main() {
   new Vue({
     router,
     store,
-    mounted () {
+    mounted() {
       store.commit('SET_SIDEBAR_TYPE', Vue.ls.get(SIDEBAR_TYPE, true))
       store.commit('TOGGLE_THEME', Vue.ls.get(DEFAULT_THEME, config.navTheme))
       store.commit('TOGGLE_LAYOUT_MODE', Vue.ls.get(DEFAULT_LAYOUT_MODE, config.layout))
@@ -81,7 +95,7 @@ function main() {
       store.commit('TOGGLE_WEAK', Vue.ls.get(DEFAULT_COLOR_WEAK, config.colorWeak))
       store.commit('TOGGLE_COLOR', Vue.ls.get(DEFAULT_COLOR, config.primaryColor))
       store.commit('SET_TOKEN', Vue.ls.get(ACCESS_TOKEN))
-      store.commit('SET_MULTI_PAGE',Vue.ls.get(DEFAULT_MULTI_PAGE,config.multipage))
+      store.commit('SET_MULTI_PAGE', Vue.ls.get(DEFAULT_MULTI_PAGE, config.multipage))
     },
     render: h => h(App)
   }).$mount('#app')

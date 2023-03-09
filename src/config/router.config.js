@@ -5,7 +5,6 @@ import { UserLayout, TabLayout, RouteView, BlankLayout, PageView } from '@/compo
  * @type {[null,null]}
  */
 export const asyncRouterMap = [
-
   {
     path: '/',
     name: 'dashboard',
@@ -13,7 +12,6 @@ export const asyncRouterMap = [
     meta: { title: '首页' },
     redirect: '/dashboard/analysis',
     children: [
-
       // // dashboard
       // {
       //   path: '/dashboard',
@@ -285,7 +283,9 @@ export const asyncRouterMap = [
     ]
   },
   {
-    path: '*', redirect: '/404', hidden: true
+    path: '*',
+    redirect: '/404',
+    hidden: true
   }
 ]
 
@@ -319,7 +319,7 @@ export const constantRouterMap = [
         path: 'alteration',
         name: 'alteration',
         component: () => import(/* webpackChunkName: "user" */ '@/views/user/alteration/Alteration')
-      },
+      }
     ]
   },
 
@@ -358,7 +358,7 @@ export const constantRouterMap = [
         path: 'login',
         name: 'oauth2-app-login',
         component: () => import(/* webpackChunkName: "oauth2-app.login" */ '@/views/user/oauth2/OAuth2Login')
-      },
+      }
     ]
   },
 
@@ -378,5 +378,12 @@ export const constantRouterMap = [
     path: '/404',
     component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
   },
-
+  {
+    path: '/attendance/day',
+    component: () => import('@/views/attendance/dailyAttendance/dailyAttendance.vue')
+  },
+  {
+    path: '/attendance/month',
+    component: () => import('@/views/attendance/monthlyAttendance/monthlyAttendance.vue')
+  }
 ]
