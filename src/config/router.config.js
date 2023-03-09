@@ -385,5 +385,17 @@ export const constantRouterMap = [
   {
     path: '/attendance/month',
     component: () => import('@/views/attendance/monthlyAttendance/monthlyAttendance.vue')
+  },
+  {
+    path: '/classes',
+    component: () => import('@/views/classes/classes.vue')
+  },
+  {
+    path: '/holidayPool',
+    component: () => import('@/views/holidayPool/holidayPool.vue')
+  },
+  {
+    path: '/application/launchApplication',
+    component: () => import('@/views/application/launchApplication.vue')
   }
 ]

@@ -5,7 +5,7 @@
  * @Description: 日考勤记录
  * @params: 
  * @Date: 2023-03-08 11:05:22
- * @LastEditTime: 2023-03-08 21:06:07
+ * @LastEditTime: 2023-03-09 14:42:19
 -->
 <template>
   <div class="dailyAttendance-container page-container">
@@ -164,9 +164,6 @@ export default {
   }
   .right-info {
     width: 32.5%;
-
-    .info-data {
-    }
   }
 
   // antd日历样式修改
