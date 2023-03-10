@@ -119,9 +119,10 @@ export default {
     handleSubmit() {
       // this.loginBtn = true
       if (this.customActiveKey === 'tab1') {
-        this.$router.push({ path: '/attendance/day' })
+        // this.$router.push({ path: '/attendance/day' })
+        // return
         // 使用账户密码登录
-        // this.$refs.alogin.handleLogin(this.rememberMe)
+        this.$refs.alogin.handleLogin(this.rememberMe)
       } else {
         // 手机号码登录
         this.$refs.plogin.handleLogin(this.rememberMe)

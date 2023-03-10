@@ -7,7 +7,13 @@
         </a-input>
       </a-form-model-item>
       <a-form-model-item required prop="password">
-        <a-input v-model="model.password" size="large" type="password" autocomplete="false" placeholder="请输入密码 / 123456">
+        <a-input
+          v-model="model.password"
+          size="large"
+          type="password"
+          autocomplete="false"
+          placeholder="请输入密码 / 123456"
+        >
           <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }" />
         </a-input>
       </a-form-model-item>
@@ -48,44 +54,49 @@ export default {
         inputCode: ''
       },
       validatorRules: {
-        username: [
-          { required: true, message: '请输入用户名!' },
-          { validator: this.handleUsernameOrEmail }
+        username: [{ required: true, message: '请输入用户名!' }, { validator: this.handleUsernameOrEmail }],
+        password: [
+          {
+            required: true,
+            message: '请输入密码!',
+            validator: 'click'
+          }
         ],
-        password: [{
-          required: true, message: '请输入密码!', validator: 'click'
-        }],
-        inputCode: [{
-          required: true, message: '请输入验证码!'
-        }]
+        inputCode: [
+          {
+            required: true,
+            message: '请输入验证码!'
+          }
+        ]
       }
-
     }
   },
   created() {
-    this.handleChangeCheckCode();
+    this.handleChangeCheckCode()
   },
   methods: {
     ...mapActions(['Login']),
     /**刷新验证码*/
     handleChangeCheckCode() {
-      this.currdatetime = new Date().getTime();
+      this.currdatetime = new Date().getTime()
       this.model.inputCode = ''
-      getAction(`/sys/randomImage/${this.currdatetime}`).then(res => {
-        if (res.success) {
-          this.randCodeImage = res.result
-          this.requestCodeSuccess = true
-        } else {
-          this.$message.error(res.message)
+      getAction(`/sys/randomImage/${this.currdatetime}`)
+        .then(res => {
+          if (res.success) {
+            this.randCodeImage = res.result
+            this.requestCodeSuccess = true
+          } else {
+            this.$message.error(res.message)
+            this.requestCodeSuccess = false
+          }
+        })
+        .catch(() => {
           this.requestCodeSuccess = false
-        }
-      }).catch(() => {
-        this.requestCodeSuccess = false
-      })
+        })
     },
     // 判断登录类型
     handleUsernameOrEmail(rule, value, callback) {
-      const regex = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/;
+      const regex = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/
       if (regex.test(value)) {
         this.loginType = 0
       } else {
@@ -102,57 +113,58 @@ export default {
       let promiseArray = []
       for (let item of arr) {
         let p = new Promise((resolve, reject) => {
-          this.$refs['form'].validateField(item, (err) => {
+          this.$refs['form'].validateField(item, err => {
             if (!err) {
-              resolve();
+              resolve()
             } else {
-              reject(err);
+              reject(err)
             }
           })
-        });
+        })
         promiseArray.push(p)
       }
-      Promise.all(promiseArray).then(() => {
-        callback()
-      }).catch(err => {
-        callback(err)
-      })
+      Promise.all(promiseArray)
+        .then(() => {
+          callback()
+        })
+        .catch(err => {
+          callback(err)
+        })
     },
     acceptUsername(username) {
       this.model['username'] = username
     },
     //账号密码登录
     handleLogin(rememberMe) {
-      this.validateFields(['username', 'password', 'inputCode'], (err) => {
+      this.validateFields(['username', 'password', 'inputCode'], err => {
         if (!err) {
           let loginParams = {
             username: this.model.username,
             password: this.model.password,
             captcha: this.model.inputCode,
             checkKey: this.currdatetime,
-            remember_me: rememberMe,
+            remember_me: rememberMe
           }
-          console.log("登录参数", loginParams)
-          this.Login(loginParams).then((res) => {
-            this.$emit('success', res.result)
-          }).catch((err) => {
-            //update-begin-author: taoyan date:20220425 for: 登录页面，当输入验证码错误时，验证码图片要刷新一下，而不是保持旧的验证码图片不变 #41
-            if (err && err.code === 412) {
-              this.handleChangeCheckCode();
-            }
-            //update-end-author: taoyan date:20220425 for: 登录页面，当输入验证码错误时，验证码图片要刷新一下，而不是保持旧的验证码图片不变 #41
-            this.$emit('fail', err)
-          });
+          console.log('登录参数', loginParams)
+          this.Login(loginParams)
+            .then(res => {
+              this.$emit('success', res.result)
+            })
+            .catch(err => {
+              //update-begin-author: taoyan date:20220425 for: 登录页面，当输入验证码错误时，验证码图片要刷新一下，而不是保持旧的验证码图片不变 #41
+              if (err && err.code === 412) {
+                this.handleChangeCheckCode()
+              }
+              //update-end-author: taoyan date:20220425 for: 登录页面，当输入验证码错误时，验证码图片要刷新一下，而不是保持旧的验证码图片不变 #41
+              this.$emit('fail', err)
+            })
         } else {
-          this.$emit('success')
-          // this.$emit('validateFail')
+          // this.$emit('success')
+          this.$emit('validateFail')
         }
       })
     }
-
-
   }
-
 }
 </script>
 

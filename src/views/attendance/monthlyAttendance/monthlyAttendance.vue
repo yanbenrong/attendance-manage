@@ -1,7 +1,16 @@
+<!--
+ * @Author: YanBenrong
+ * @LastEdit: YanBenrong
+ * @LastEditors: YanBenrong
+ * @Description: 
+ * @params: 
+ * @Date: 2023-03-08 16:22:28
+ * @LastEditTime: 2023-03-10 15:44:48
+-->
 <template>
   <div class="monthlyAttendance-container page-container">
     <div><span class="mr-20">考勤周期 </span><a-month-picker /></div>
-    <div v-if="false" class="month-attendance-info">
+    <div v-if="true" class="month-attendance-info">
       <a-descriptions title="考勤详情" bordered :column="1">
         <a-descriptions-item label="当月应该出勤(天)">
           0

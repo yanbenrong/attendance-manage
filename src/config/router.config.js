@@ -389,13 +389,13 @@ export const constantRouterMap = [
   {
     path: '/classes',
     component: () => import('@/views/classes/classes.vue')
-  },
-  {
-    path: '/holidayPool',
-    component: () => import('@/views/holidayPool/holidayPool.vue')
-  },
-  {
-    path: '/application/launchApplication',
-    component: () => import('@/views/application/launchApplication.vue')
   }
+  // {
+  //   path: '/holidayPool',
+  //   component: () => import('@/views/holidayPool/holidayPool.vue')
+  // }
+  // {
+  //   path: '/application/launchApplication',
+  //   component: () => import('@/views/application/launchApplication.vue')
+  // }
 ]

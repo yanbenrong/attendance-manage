@@ -2,27 +2,34 @@
  * @Author: YanBenrong
  * @LastEdit: YanBenrong
  * @LastEditors: YanBenrong
- * @Description: 休假表单
+ * @Description: 休假表单 
  * @params: 
  * @Date: 2023-03-09 15:18:11
- * @LastEditTime: 2023-03-09 18:26:57
+ * @LastEditTime: 2023-03-10 14:42:07
 -->
 <template>
   <div class="vacate-form">
     <h4 class="form-title">请假申请</h4>
     <a-form :form="form" :label-col="{ span: 3 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
-      <a-form-item label="请假地点" :colon="false">
+      <a-form-item label="假期类型" :colon="false">
         <a-select
-          v-decorator="['type', { rules: [{ required: true, message: '请选择请假类型！' }] }]"
-          placeholder="请选择请假类型"
+          v-decorator="['type', { rules: [{ required: true, message: '请选择假期类型！' }] }]"
+          placeholder="请选择假期类型"
           :options="typeOption"
           allowClear
+          @change="vacateTypeChange"
+          label-in-value
         >
         </a-select>
-        <div class="form-help">
-          备注:①请假时长超过1天且第一天是全天请假的，请假开始时间需早于或等于班次最早上班时间。；②请假时长超过1天，第一天请假半天且请假结束时间为班次弹性后时间的，需要按天拆开分别提交请假电子流。
+        <div v-if="vacateTypeTip[vacateType]">
+          <div class="form-help">
+            备注： {{ vacateTypeTip[vacateType].tip }}
+            <a-button type="link" size="default">
+              查看各考勤专员邮箱
+            </a-button>
+          </div>
+          <div class="form-tip">{{ vacateType }}最小单位{{ vacateTypeTip[vacateType].minUnit }}</div>
         </div>
-        <div class="form-tip">最小单位30分钟</div>
       </a-form-item>
       <a-form-item label="开始时间-结束时间" :colon="false">
         <a-range-picker
@@ -46,7 +53,7 @@
           :maxLength="300"
         />
       </a-form-item>
-      <a-form-item label="附件" help="仅能上传图片">
+      <a-form-item label="附件">
         <a-upload
           action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
           list-type="picture-card"
@@ -64,6 +71,12 @@
         <a-modal :bodyStyle="{ padding: '25px' }" :visible="previewVisible" :footer="null" @cancel="handleCancel">
           <img alt="example" style="width: 100%" :src="previewImage" />
         </a-modal>
+        <div style="line-height: 21px;">
+          上传图片
+          <span v-if="vacateTypeTip[vacateType] && vacateTypeTip[vacateType].uploadTip" class="red-font"
+            >({{ vacateTypeTip[vacateType].uploadTip }})</span
+          >
+        </div>
       </a-form-item>
       <a-form-item :wrapper-col="{ span: 6, offset: 3 }">
         <a-button type="primary" html-type="submit">
@@ -79,6 +92,7 @@
 
 <script>
 import { getBase64 } from '@/utils/attendanceUtils.js'
+import { vacateTypeTip } from './staticData'
 export default {
   data() {
     return {
@@ -86,12 +100,12 @@ export default {
       previewVisible: false, // 图片预览
       previewImage: '', // 预览图片数据
       fileList: [
-        {
-          uid: '-1',
-          name: 'image.png',
-          status: 'done',
-          url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-        }
+        // {
+        //   uid: '-1',
+        //   name: 'image.png',
+        //   status: 'done',
+        //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+        // }
       ], // 附件图片列表
       typeOption: [
         { key: '1', title: '事假' },
@@ -105,8 +119,10 @@ export default {
         { key: '9', title: '护理假' },
         { key: '10', title: '丧假与路程假' },
         { key: '11', title: '育儿假' },
-        { key: '12', title: '医疗假' }
-      ]
+        { key: '12', title: '医疗期' }
+      ],
+      vacateType: '', // 当前请假类型
+      vacateTypeTip // 请假类型备注静态数据
     }
   },
   methods: {
@@ -137,7 +153,37 @@ export default {
     },
     // 上传文件变化回调
     handleChange({ fileList }) {
+      console.log('文件', fileList)
       this.fileList = fileList
+    },
+    // 请假类型选择回调
+    vacateTypeChange(value) {
+      console.log('请假类型change', value)
+
+      let role = 1
+      if (!value) return
+      this.vacateType = value.label
+      if (value.label === '事假') this.showCasualLeaveConfirm()
+      if (role === 1 && ['产检假', '产假', '哺乳假'].includes(value.label)) this.noPermissionProm()
+    },
+    // 事假提示弹窗
+    showCasualLeaveConfirm() {
+      this.$confirm({
+        title: '提示',
+        content: h => (
+          <div style="color:#000;">
+            您当前剩余补休0.87500天，剩余年假5.00000天(其中去年结转5.00000天),为了保证您领薪的完整性，建议优先申请补休/年假电子流。
+          </div>
+        ),
+        centered: true
+      })
+    },
+    // 无权限申请提示
+    noPermissionProm() {
+      this.$nextTick(() => {
+        this.form.setFieldsValue({ type: undefined })
+      })
+      this.$message.warning({ content: `您没有权限申请${this.vacateType}!`, duration: 2 })
     }
   }
 }
@@ -155,6 +201,10 @@ export default {
   }
   .form-tip {
     color: #fa8c16;
+  }
+  .red-font {
+    font-size: 14px;
+    color: red;
   }
 }
 .ant-modal-close-x {
