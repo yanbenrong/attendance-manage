@@ -2,10 +2,10 @@
  * @Author: YanBenrong
  * @LastEdit: YanBenrong
  * @LastEditors: YanBenrong
- * @Description: 休假表单 
+ * @Description: 请假表单 
  * @params: 
  * @Date: 2023-03-09 15:18:11
- * @LastEditTime: 2023-03-10 14:42:07
+ * @LastEditTime: 2023-03-15 14:30:53
 -->
 <template>
   <div class="vacate-form">
@@ -24,7 +24,7 @@
         <div v-if="vacateTypeTip[vacateType]">
           <div class="form-help">
             备注： {{ vacateTypeTip[vacateType].tip }}
-            <a-button type="link" size="default">
+            <a-button type="link" size="default" @click="showDrawer">
               查看各考勤专员邮箱
             </a-button>
           </div>
@@ -87,12 +87,26 @@
         </a-button>
       </a-form-item>
     </a-form>
+    <!-- 各考勤专员邮箱    -->
+    <a-drawer placement="right" :closable="false" :visible="drawerVisible" @close="onClose" :width="500">
+      <template slot="title"><div class="drawer-title">查看各考勤专员邮箱(考勤专员联系表)</div></template>
+      <div class="mail-drawer-container">
+        <div v-for="item in specialistMail" class="drawer-item">
+          <div class="drawer--item-name">{{ item.name }}</div>
+          <p>角色：{{ item.role }}</p>
+          <p>部门：{{ item.department }}</p>
+          <p>工号：{{ item.jobNumber }}</p>
+          <p>邮箱：{{ item.mail }}</p>
+        </div>
+      </div>
+    </a-drawer>
   </div>
 </template>
 
 <script>
 import { getBase64 } from '@/utils/attendanceUtils.js'
-import { vacateTypeTip } from './staticData'
+import { vacateTypeTip, specialistMail } from './staticData'
+import { initDictOptions } from '@/components/dict/JDictSelectUtil'
 export default {
   data() {
     return {
@@ -107,23 +121,15 @@ export default {
         //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
         // }
       ], // 附件图片列表
-      typeOption: [
-        { key: '1', title: '事假' },
-        { key: '2', title: '病假' },
-        { key: '3', title: '年假' },
-        { key: '4', title: '补休' },
-        { key: '5', title: '婚假' },
-        { key: '6', title: '产检假' },
-        { key: '7', title: '产假' },
-        { key: '8', title: '哺乳假' },
-        { key: '9', title: '护理假' },
-        { key: '10', title: '丧假与路程假' },
-        { key: '11', title: '育儿假' },
-        { key: '12', title: '医疗期' }
-      ],
+      typeOption: [],
       vacateType: '', // 当前请假类型
-      vacateTypeTip // 请假类型备注静态数据
+      vacateTypeTip, // 请假类型备注静态数据
+      specialistMail, // 考勤专员邮箱数据
+      drawerVisible: false
     }
+  },
+  created() {
+    this.getLeaveTypeDict()
   },
   methods: {
     // 提交回调
@@ -184,6 +190,18 @@ export default {
         this.form.setFieldsValue({ type: undefined })
       })
       this.$message.warning({ content: `您没有权限申请${this.vacateType}!`, duration: 2 })
+    },
+    // 抽屉显示隐藏
+    showDrawer() {
+      this.drawerVisible = true
+    },
+    onClose() {
+      this.drawerVisible = false
+    },
+    async getLeaveTypeDict() {
+      let dict = await initDictOptions('leave_type')
+      console.log('请假类型字典', dict)
+      this.typeOption = dict.result
     }
   }
 }
@@ -205,6 +223,25 @@ export default {
   .red-font {
     font-size: 14px;
     color: red;
+  }
+}
+.drawer-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+.mail-drawer-container {
+  p {
+    margin-bottom: 5px;
+  }
+
+  .drawer-item {
+    margin-top: 15px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .drawer--item-name {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 }
 .ant-modal-close-x {

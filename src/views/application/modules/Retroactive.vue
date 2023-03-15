@@ -5,7 +5,7 @@
  * @Description: 补签表单
  * @params: 
  * @Date: 2023-03-09 15:17:14
- * @LastEditTime: 2023-03-09 16:26:27
+ * @LastEditTime: 2023-03-15 14:48:45
 -->
 <template>
   <div class="retroactive-form">
@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import { attendanceResign } from '@/api/myAttendance.js'
+
 export default {
   data() {
     return {
@@ -61,9 +63,15 @@ export default {
   methods: {
     handleSubmit(e) {
       e.preventDefault()
-      this.form.validateFields((err, values) => {
+      this.form.validateFields(async (err, values) => {
         if (!err) {
           console.log('Received values of form: ', values)
+          let res = await attendanceResign({
+            resignRemark: 'resignRemark',
+            resignTime: '2023-03-11 14:31:55',
+            resignType: 0
+          })
+          console.log('补签申请', res)
         }
       })
     },

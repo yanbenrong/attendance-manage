@@ -5,7 +5,7 @@
  * @Description: 假期池
  * @params: 
  * @Date: 2023-03-09 11:06:41
- * @LastEditTime: 2023-03-09 11:34:22
+ * @LastEditTime: 2023-03-14 17:03:29
 -->
 <template>
   <div class="holiday-container page-container">
@@ -33,9 +33,14 @@
 </template>
 
 <script>
+import { getLeavePool } from '@/api/myAttendance.js'
 export default {
   data() {
     return {}
+  },
+  async created() {
+    let res = await getLeavePool()
+    console.log('😍2023-03-13 假期池res', res)
   }
 }
 </script>

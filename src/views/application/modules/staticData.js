@@ -52,4 +52,47 @@ export const vacateTypeTip = {
       '需同时提供社会医疗保险指定医院或绑定的社康中心开具并盖医院（或中心）印章的病假证明及缴费凭证、病例、检查单等'
   }
 }
+// 考勤专员邮箱
+export const specialistMail = [
+  { name: '郑蕊', role: '考勤专员', department: 'HWG其他', jobNumber: '0000059152', mail: 'zhengrui@chinasoftinc.com' },
+  { name: '范世萍', role: '其他', department: '其他', jobNumber: '0000101612', mail: 'fanshiping@chinasofti.com' },
+  {
+    name: '陈雪爱',
+    role: '考勤专员',
+    department: 'HWG(技术服务业务线、流程IT业务线、网络业务线)',
+    jobNumber: '0000158860',
+    mail: 'chenxueai@chinasofti.com'
+  },
+  { name: '任杰', role: '考勤专员', department: 'ASG其他', jobNumber: '0000178544', mail: 'renjie001@chinasofti.com' },
+  {
+    name: '唐欢',
+    role: '考勤专员',
+    department: 'FBG其他',
+    jobNumber: '0000274522',
+    mail: 'tanghuan001@chinasofti.com'
+  },
+  {
+    name: '赵萍萍',
+    role: '考勤专员',
+    department: 'ASG(BPO事业部、腾讯事业部、终端事业部)+FBG(汇丰业务线)',
+    jobNumber: '0000309895',
+    mail: 'zhaopingping@chinasofti.com'
+  },
+  { name: '王佐洋', role: '考勤专员', department: 'ABG', jobNumber: '0000327940', mail: 'wangzuoyang@chinasofti.com' }
+]
+// 请假类型下拉选择框option
+export const typeOption = [
+  { key: '1', title: '事假' },
+  { key: '2', title: '病假' },
+  { key: '3', title: '年假' },
+  { key: '4', title: '补休' },
+  { key: '5', title: '婚假' },
+  { key: '6', title: '产检假' },
+  { key: '7', title: '产假' },
+  { key: '8', title: '哺乳假' },
+  { key: '9', title: '护理假' },
+  { key: '10', title: '丧假与路程假' },
+  { key: '11', title: '育儿假' },
+  { key: '12', title: '医疗期' }
+]
 

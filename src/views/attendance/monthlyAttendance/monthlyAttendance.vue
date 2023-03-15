@@ -5,11 +5,11 @@
  * @Description: 
  * @params: 
  * @Date: 2023-03-08 16:22:28
- * @LastEditTime: 2023-03-10 15:44:48
+ * @LastEditTime: 2023-03-15 10:14:01
 -->
 <template>
   <div class="monthlyAttendance-container page-container">
-    <div><span class="mr-20">考勤周期 </span><a-month-picker /></div>
+    <div><span class="mr-20">考勤周期 </span><a-month-picker v-model="monthDate" /></div>
     <div v-if="true" class="month-attendance-info">
       <a-descriptions title="考勤详情" bordered :column="1">
         <a-descriptions-item label="当月应该出勤(天)">
@@ -63,9 +63,36 @@
 </template>
 
 <script>
+import moment from 'moment'
+import { getMonthlyAttendance } from '@/api/myAttendance.js'
 export default {
   data() {
-    return {}
+    return {
+      monthDate: null
+    }
+  },
+  watch: {
+    monthDate(newVal) {
+      let date = newVal.format('YYYY-MM').replace('-', '')
+      this.getData(date)
+    }
+  },
+  created() {
+    console.log('初始化月记录')
+    this.initCurrentDate()
+  },
+  methods: {
+    initCurrentDate() {
+      this.monthDate = moment()
+    },
+    // 获取月考勤数据
+    async getData(date) {
+      let res = await getMonthlyAttendance({ signDate: date })
+      console.log('😍2023-03-13 res', res)
+      if (res.code == 200) {
+      } else {
+      }
+    }
   }
 }
 </script>

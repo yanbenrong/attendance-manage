@@ -5,7 +5,7 @@
  * @Description: 日考勤记录
  * @params: 
  * @Date: 2023-03-08 11:05:22
- * @LastEditTime: 2023-03-09 14:42:19
+ * @LastEditTime: 2023-03-15 10:49:10
 -->
 <template>
   <div class="dailyAttendance-container page-container">
@@ -27,7 +27,7 @@
         style="box-shadow: rgb(206 206 206) 0px 0px 9px 0px;border-radius: 5px;height: 100%;"
         :bodyStyle="{ height: 'calc(100% - 48px)' }"
       >
-        <div v-if="false" class="info-data">
+        <div v-if="!isEmptyData" class="info-data">
           <p>
             <span class="mr-20">08：30：00</span><span class="mr-20">上班</span
             ><span class="mr-20">打卡(08：45：23)</span>
@@ -46,30 +46,39 @@
 
 <script>
 import moment from 'moment'
+import { getDailyAttendance } from '@/api/myAttendance.js'
 
 export default {
+  name: 'attendance-dailyAttendance-dailyRecord',
   data() {
     return {
+      nowMonth: '',
       nowDate: '', // 当前时间
-      ycData: ['2023-03-01'] // 考勤异常数据
+      ycData: ['2023-03-01'], // 考勤异常数据
+      isEmptyData: false
     }
   },
   created() {
+    console.log('初始化日记录')
     this.initNowDate()
+    this.getData(this.nowDate)
   },
   methods: {
     // 初始化当前日期
     initNowDate() {
       this.nowDate = moment().format('YYYY-MM-DD') // 转换为指定格式的字符串
+      this.nowMonth = moment().format('YYYY-MM') // 转换为指定格式的字符串
     },
     // 日期面板变化回调
     onPanelChange(value, mode) {
       console.log('面板变化回调', value, mode)
+      this.nowMonth = value.format('YYYY-MM')
     },
     // 点击选择日期回调
     selectChange(date) {
-      console.log('日期变化回调', date.format('YYYY-MM-DD'))
-      this.nowDate = date.format('YYYY-MM-DD')
+      let formatDate = date.format('YYYY-MM-DD')
+      this.nowDate = formatDate
+      this.getData(formatDate)
     },
     // 自定义日历头部
     headerRender({ value, onChange }) {
@@ -103,6 +112,11 @@ export default {
           </a-select-option>
         )
       }
+
+      const toPath = () => {
+        this.$router.push(`/attendance/dailyAttendance/punchData/${this.nowMonth}`)
+        // this.$router.push({ path: '/attendance/monthlyAttendance', query: { add: 'xxx' } })
+      }
       return (
         <div style={{ padding: '20px 17px' }}>
           <a-row gutter={16} type="flex" align="middle">
@@ -135,7 +149,9 @@ export default {
               </a-select>
             </a-col>
             <a-col>
-              <a-button type="primary">查看打卡数据</a-button>
+              <a-button type="primary" onClick={toPath}>
+                查看打卡数据
+              </a-button>
             </a-col>
           </a-row>
         </div>
@@ -144,6 +160,17 @@ export default {
     // 判断日历单元格是否考勤异常
     isYcDateCell(value) {
       return this.ycData.includes(value.format('YYYY-MM-DD'))
+    },
+    // 获取日考勤数据
+    async getData(date) {
+      this.isEmptyData = true
+      let res = await getDailyAttendance({ signDate: date })
+      console.log('😍2023-03-13 获取日考勤数据', res)
+      if (res.code == 200) {
+        this.isEmptyData = false
+      } else {
+        this.isEmptyData = true
+      }
     }
   }
 }
