@@ -5,7 +5,7 @@
  * @Description: 请假表单 
  * @params: 
  * @Date: 2023-03-09 15:18:11
- * @LastEditTime: 2023-03-15 14:30:53
+ * @LastEditTime: 2023-03-15 17:02:09
 -->
 <template>
   <div class="vacate-form">
@@ -210,7 +210,8 @@ export default {
 <style lang="less" scope>
 .vacate-form {
   .form-title {
-    color: #9598a3;
+    font-size: 18px;
+    font-weight: 600;
   }
   .form-help {
     line-height: 18px;

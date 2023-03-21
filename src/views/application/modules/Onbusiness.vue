@@ -5,7 +5,7 @@
  * @Description: 公出表单
  * @params: 
  * @Date: 2023-03-09 15:19:01
- * @LastEditTime: 2023-03-09 17:42:00
+ * @LastEditTime: 2023-03-15 17:02:33
 -->
 <template>
   <div class="onbusiness-form">
@@ -76,6 +76,7 @@
 
 <script>
 import { getBase64 } from '@/utils/attendanceUtils.js'
+import { attendanceOut } from '@/api/myAttendance.js'
 export default {
   data() {
     return {
@@ -96,9 +97,20 @@ export default {
     // 提交回调
     handleSubmit(e) {
       e.preventDefault()
-      this.form.validateFields((err, values) => {
+      this.form.validateFields(async (err, values) => {
         if (!err) {
           console.log('Received values of form: ', values)
+          let { onbusinessPlace, explain, time } = values
+          let res = await attendanceOut({
+            outPlace: onbusinessPlace,
+            startDate: time[0].format('YYYY-MM-DD HH:MM:SS'),
+            endDate: time[1].format('YYYY-MM-DD HH:MM:SS'),
+            outHours: 8,
+            outDays: 1,
+            outReason: explain,
+            tenantId: 123
+          })
+          console.log('公出申请', res)
         }
       })
     },
@@ -129,7 +141,8 @@ export default {
 <style lang="less" scope>
 .onbusiness-form {
   .form-title {
-    color: #9598a3;
+    font-size: 18px;
+    font-weight: 600;
   }
   .form-help {
     line-height: 18px;

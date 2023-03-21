@@ -387,15 +387,27 @@ export const constantRouterMap = [
     component: () => import('@/views/attendance/monthlyAttendance/monthlyAttendance.vue')
   },
   {
+    path: '/applicationRecord',
+    component: () => import('@/views/applicationRecord/applicationRecord.vue')
+  },
+  {
+    path: '/approval/waitApproval',
+    component: () => import('@/views/approval/waitApproval.vue')
+  },
+  {
+    path: '/approval/alreadyApproval',
+    component: () => import('@/views/approval/alreadyApproval.vue')
+  },
+  {
     path: '/classes',
     component: () => import('@/views/classes/classes.vue')
+  },
+  {
+    path: '/holidayPool',
+    component: () => import('@/views/holidayPool/holidayPool.vue')
+  },
+  {
+    path: '/application/launchApplication',
+    component: () => import('@/views/application/launchApplication.vue')
   }
-  // {
-  //   path: '/holidayPool',
-  //   component: () => import('@/views/holidayPool/holidayPool.vue')
-  // }
-  // {
-  //   path: '/application/launchApplication',
-  //   component: () => import('@/views/application/launchApplication.vue')
-  // }
 ]

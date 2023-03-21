@@ -5,7 +5,7 @@
  * @Description: 补签表单
  * @params: 
  * @Date: 2023-03-09 15:17:14
- * @LastEditTime: 2023-03-15 14:48:45
+ * @LastEditTime: 2023-03-15 15:34:42
 -->
 <template>
   <div class="retroactive-form">
@@ -25,7 +25,7 @@
           v-decorator="['type', { rules: [{ required: true, message: '请选择补签类型！' }] }]"
           placeholder="请选择补签类型"
         >
-          <a-select-option value="punchCard">
+          <a-select-option value="0">
             打卡
           </a-select-option>
         </a-select>
@@ -66,10 +66,11 @@ export default {
       this.form.validateFields(async (err, values) => {
         if (!err) {
           console.log('Received values of form: ', values)
+          let { reason, time, type } = values
           let res = await attendanceResign({
-            resignRemark: 'resignRemark',
-            resignTime: '2023-03-11 14:31:55',
-            resignType: 0
+            resignRemark: reason,
+            resignTime: time.format('YYYY-MM-DD HH:MM:SS'),
+            resignType: type
           })
           console.log('补签申请', res)
         }
@@ -85,7 +86,8 @@ export default {
 <style lang="less" scope>
 .retroactive-form {
   .form-title {
-    color: #9598a3;
+    font-size: 18px;
+    font-weight: 600;
   }
   .form-tip {
     margin-left: 81px;

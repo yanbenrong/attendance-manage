@@ -11,6 +11,8 @@ export const getAttendanceLeave = params => postAction('/attendance/kqAttendance
 
 // 补签申请
 export const attendanceResign = params => postAction('attendance/kqAttendanceResign/add', params)
+// 公出申请
+export const attendanceOut = params => postAction('attendance/kqAttendanceOut/add', params)
 
 // 假期池
 export const getLeavePool = params => getAction('/attendance/kqLeavePool/list', params)
