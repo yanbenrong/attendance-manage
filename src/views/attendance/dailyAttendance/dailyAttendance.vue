@@ -5,7 +5,7 @@
  * @Description: 日考勤记录
  * @params: 
  * @Date: 2023-03-08 11:05:22
- * @LastEditTime: 2023-03-15 10:49:10
+ * @LastEditTime: 2023-03-22 17:19:55
 -->
 <template>
   <div class="dailyAttendance-container page-container">
@@ -46,7 +46,7 @@
 
 <script>
 import moment from 'moment'
-import { getDailyAttendance } from '@/api/myAttendance.js'
+import { getDailyAttendance, getMonthlyAbnormalList } from '@/api/myAttendance.js'
 
 export default {
   name: 'attendance-dailyAttendance-dailyRecord',
@@ -54,7 +54,7 @@ export default {
     return {
       nowMonth: '',
       nowDate: '', // 当前时间
-      ycData: ['2023-03-01'], // 考勤异常数据
+      ycData: [], // 考勤异常数据
       isEmptyData: false
     }
   },
@@ -62,6 +62,7 @@ export default {
     console.log('初始化日记录')
     this.initNowDate()
     this.getData(this.nowDate)
+    this.getAbnormalData(this.nowMonth)
   },
   methods: {
     // 初始化当前日期
@@ -161,6 +162,15 @@ export default {
     isYcDateCell(value) {
       return this.ycData.includes(value.format('YYYY-MM-DD'))
     },
+    // 获取月异常考勤 month: yyyy-mm
+    async getAbnormalData(month) {
+      let res = await getMonthlyAbnormalList({ selMonth: month })
+      if (res.code === 200) {
+        this.ycData = res.result
+      } else {
+        this.ycData = []
+      }
+    },
     // 获取日考勤数据
     async getData(date) {
       this.isEmptyData = true
@@ -184,7 +194,7 @@ export default {
     width: 62.5%;
     border: 1px solid #1890ff;
     border-radius: 5px;
-
+    min-width: 755px;
     .yc-font {
       font-size: 14px;
     }

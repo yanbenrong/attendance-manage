@@ -5,7 +5,7 @@
  * @Description: 补签表单
  * @params: 
  * @Date: 2023-03-09 15:17:14
- * @LastEditTime: 2023-03-15 15:34:42
+ * @LastEditTime: 2023-03-22 10:43:23
 -->
 <template>
   <div class="retroactive-form">
@@ -48,16 +48,20 @@
         </a-button>
       </a-form-item>
     </a-form>
+    <ApproverModal :visible="ApproverModalVisible" @handleOk="handleMolalOk"></ApproverModal>
   </div>
 </template>
 
 <script>
 import { attendanceResign } from '@/api/myAttendance.js'
+import ApproverModal from '../components/ApproverModal.vue'
 
 export default {
+  components: { ApproverModal },
   data() {
     return {
-      form: this.$form.createForm(this, { name: 'rotroactive ' })
+      form: this.$form.createForm(this, { name: 'rotroactive ' }),
+      ApproverModalVisible: false // 选择审批人弹窗
     }
   },
   methods: {
@@ -65,7 +69,10 @@ export default {
       e.preventDefault()
       this.form.validateFields(async (err, values) => {
         if (!err) {
+          // 选择审批人
+          this.ApproverModalVisible = true
           console.log('Received values of form: ', values)
+          return
           let { reason, time, type } = values
           let res = await attendanceResign({
             resignRemark: reason,
@@ -78,6 +85,11 @@ export default {
     },
     handleReset() {
       this.form.resetFields()
+    },
+    // 选择审批人 ok
+    handleMolalOk(params) {
+      this.ApproverModalVisible = false
+      console.log('审批人', params)
     }
   }
 }

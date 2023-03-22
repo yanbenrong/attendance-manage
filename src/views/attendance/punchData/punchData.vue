@@ -5,19 +5,11 @@
  * @Description: 
  * @params: 
  * @Date: 2023-03-13 15:05:40
- * @LastEditTime: 2023-03-15 11:16:07
+ * @LastEditTime: 2023-03-22 14:04:49
 -->
 <template>
   <a-card :bordered="false">
-    <s-table
-      ref="table"
-      size="default"
-      :columns="columns"
-      :data="loadData"
-      :showAlertInfo="false"
-      @onSelect="onChange"
-      rowKey="no"
-    >
+    <s-table ref="table" size="default" :columns="columns" :data="loadData" :showAlertInfo="false" rowKey="no">
       <span slot="action" slot-scope="text, record">
         <a @click="handleEdit(record)">编辑</a>
         <a-divider type="vertical" />
@@ -44,7 +36,7 @@
 import STable from '@/components/table/'
 import ATextarea from 'ant-design-vue/es/input/TextArea'
 import AInput from 'ant-design-vue/es/input/Input'
-import { getRoleList } from '@/api/manage'
+// import { getRoleList } from '@/api/manage'
 import { getDailyPunchData } from '@/api/myAttendance.js'
 
 export default {
@@ -62,7 +54,7 @@ export default {
       columns: [
         {
           title: '姓名',
-          dataIndex: 'id'
+          dataIndex: 'userName'
         },
         {
           title: '工号',
@@ -88,29 +80,26 @@ export default {
         // return getServiceList(Object.assign(parameter, this.queryParam)).then(res => {
         //   return res.result
         // })
-        return getDailyPunchData(Object.assign(parameter, { selMonth: this.$route.params.date })).then(res => {
-          return res.result.records
-        })
-      },
-
-      selectedRowKeys: [],
-      selectedRows: []
+        // this.$route.params.date
+        return getDailyPunchData(Object.assign(parameter, { selMonth: this.$route.params.date.replace('-', '') })).then(
+          res => {
+            if (res.code === 200) {
+              return res.result.records
+            } else {
+              return []
+            }
+          }
+        )
+      }
     }
   },
   async created() {
-    getRoleList({ t: new Date() })
+    // getRoleList({ t: new Date() })
     console.log('😍2023-03-14 params参数', this.$route.params.date)
     // let res = await getDailyPunchData({ selMonth: this.$route.params.date, pageNo: 1, pageSize: 10 })
     // console.log('😍2023-03-13 res', res)
   },
-  methods: {
-    onChange(row) {
-      this.selectedRowKeys = row.selectedRowKeys
-      this.selectedRows = row.selectedRows
-
-      console.log(this.$refs.table)
-    }
-  },
+  methods: {},
   watch: {
     /*
       'selectedRows': function (selectedRows) {

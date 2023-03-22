@@ -6,6 +6,8 @@ export const getDailyAttendance = params => postAction('/attendance/kqAttendance
 export const getDailyPunchData = params => getAction('/attendance/kqAttendanceSign/list', params)
 // 月考勤详情
 export const getMonthlyAttendance = params => postAction('/attendance/kqAttendanceSummary/queryByDate', params)
+// 月考勤异常
+export const getMonthlyAbnormalList = params => getAction('/attendance/kqAttendanceAbnormal/abnormalList', params)
 // 请假详情
 export const getAttendanceLeave = params => postAction('/attendance/kqAttendanceLeave/queryByDate', params)
 

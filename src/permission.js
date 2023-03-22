@@ -5,7 +5,7 @@
  * @Description:
  * @params:
  * @Date: 2023-03-07 14:13:58
- * @LastEditTime: 2023-03-21 14:05:48
+ * @LastEditTime: 2023-03-22 14:45:11
  */
 import Vue from 'vue'
 import router from './router'
@@ -27,10 +27,10 @@ const whiteList = [
   '/attendance/month', // 开发
   '/classes', // 开发
   // '/holidayPool', // 开发
-  '/application/launchApplication', // 开发
-  '/applicationRecord',
-  '/approval/waitApproval',
-  '/approval/alreadyApproval'
+  // '/application/launchApplication', // 开发
+  // '/applicationRecord',
+  // '/approval/waitApproval',
+  // '/approval/alreadyApproval'
 ] // no redirect whitelist
 whiteList.push(OAUTH2_LOGIN_PAGE_PATH)
 
