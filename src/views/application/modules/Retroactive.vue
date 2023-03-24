@@ -5,7 +5,7 @@
  * @Description: 补签表单
  * @params: 
  * @Date: 2023-03-09 15:17:14
- * @LastEditTime: 2023-03-22 10:43:23
+ * @LastEditTime: 2023-03-24 16:58:58
 -->
 <template>
   <div class="retroactive-form">
@@ -44,11 +44,15 @@
           提交
         </a-button>
         <a-button :style="{ marginLeft: '8px' }" @click="handleReset">
-          重置
+          取消
         </a-button>
       </a-form-item>
     </a-form>
-    <ApproverModal :visible="ApproverModalVisible" @handleOk="handleMolalOk"></ApproverModal>
+    <ApproverModal
+      :visible="ApproverModalVisible"
+      @handleOk="handleModalOk"
+      @handleCancel="handleModalCancel"
+    ></ApproverModal>
   </div>
 </template>
 
@@ -61,9 +65,12 @@ export default {
   data() {
     return {
       form: this.$form.createForm(this, { name: 'rotroactive ' }),
-      ApproverModalVisible: false // 选择审批人弹窗
+      ApproverModalVisible: false, // 选择审批人弹窗
+      formValue: {}, // 表单值
+      approverInfo: {} // 审批人信息
     }
   },
+  inject: ['closeCurrent'],
   methods: {
     handleSubmit(e) {
       e.preventDefault()
@@ -72,24 +79,44 @@ export default {
           // 选择审批人
           this.ApproverModalVisible = true
           console.log('Received values of form: ', values)
-          return
-          let { reason, time, type } = values
-          let res = await attendanceResign({
-            resignRemark: reason,
-            resignTime: time.format('YYYY-MM-DD HH:MM:SS'),
-            resignType: type
-          })
-          console.log('补签申请', res)
+          this.formValue = values
         }
       })
     },
+    // 取消回调
     handleReset() {
-      this.form.resetFields()
+      // this.form.resetFields()
+      this.$router.go(-1)
+      this.closeCurrent()
     },
     // 选择审批人 ok
-    handleMolalOk(params) {
+    handleModalOk(params) {
       this.ApproverModalVisible = false
-      console.log('审批人', params)
+      console.log('审批人信息', params)
+      this.approverInfo = params.pmUser
+      this.submitAttendanceResign()
+    },
+    // 选择审批人 cancel
+    handleModalCancel() {
+      this.ApproverModalVisible = false
+      this.$message.error('未选择审批人')
+      // this.handleReset()
+    },
+    // 提交补签申请
+    async submitAttendanceResign() {
+      let { reason, time, type } = this.formValue
+      let res = await attendanceResign({
+        resignRemark: reason,
+        resignTime: time.format('YYYY-MM-DD HH:MM:SS'),
+        resignType: type,
+        examineUserId: this.approverInfo.id,
+        examineUserName: this.approverInfo.realname
+      })
+      if (res.success) {
+        this.$message.success('补签数据保存成功，已进入审批流程')
+        this.handleReset()
+      }
+      console.log('补签申请', res)
     }
   }
 }
@@ -97,6 +124,9 @@ export default {
 
 <style lang="less" scope>
 .retroactive-form {
+  background-color: #fff;
+  padding: 20px;
+
   .form-title {
     font-size: 18px;
     font-weight: 600;

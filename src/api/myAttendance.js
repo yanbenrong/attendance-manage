@@ -13,9 +13,21 @@ export const getAttendanceLeave = params => postAction('/attendance/kqAttendance
 
 // 补签申请
 export const attendanceResign = params => postAction('attendance/kqAttendanceResign/add', params)
+// 请假申请
+export const attendanceLeave = params => postAction('attendance/kqAttendanceLeave/add', params)
 // 公出申请
 export const attendanceOut = params => postAction('attendance/kqAttendanceOut/add', params)
+// 获取全部部门树形数据
+export const getQueryTreeList = params => getAction('/sys/sysDepart/queryTreeList', params)
+// 获取我的部门树形数据
+export const getQueryMyTreeList = params => getAction('/sys/sysDepart/queryMyDeptTreeList', params)
+// 根据部门查询用户
+export const getUserByDepid = params => getAction('/sys/user/queryUserByDepId', params)
 
+// 审批列表
+export const getExamineList = params => getAction('/attendance/kqFlowMainProcess/examineList', params)
+// 审批列表
+export const getExamineInfoById = params => getAction('/attendance/kqFlowMainProcess/queryById', params)
 // 假期池
 export const getLeavePool = params => getAction('/attendance/kqLeavePool/list', params)
 

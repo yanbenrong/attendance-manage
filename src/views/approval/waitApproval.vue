@@ -5,14 +5,20 @@
       <div class="info-left">
         <div class="left-top">已审批 19条</div>
         <div class="left-scroll">
-          <div v-for="i in 20" :key="i" class="approval-item" :class="i === 1 ? 'approval-item-active' : ''">
+          <div
+            v-for="i in examineList"
+            :key="i.processId"
+            class="approval-item"
+            :class="i.processId === processId ? 'approval-item-active' : ''"
+            @click="examineItemClick(i.processId)"
+          >
             <div class="approval-item-left">
-              <p>公出申请</p>
-              <p>王五/集成开发二部</p>
-              <p>申请时间:2023-03-06 11:15:16</p>
+              <p>{{ i.flowType }}申请</p>
+              <p>{{ i.userName || '--' }}/{{ i.deptName || '--' }}</p>
+              <p>申请时间: {{ i.createdDate }}</p>
             </div>
             <div class="approval-item-tip">
-              公
+              {{ i.flowType.slice(0, 1) }}
             </div>
           </div>
         </div>
@@ -60,14 +66,40 @@
 
 <script>
 import FilterForm from './components/FilterForm.vue'
+import { getExamineList, getExamineInfoById } from '@/api/myAttendance.js'
 export default {
   components: { FilterForm },
   data() {
-    return {}
+    return {
+      examineList: [], // 审批列表数据
+      processId: '' // 当前选中审批审批流程id
+    }
+  },
+  created() {
+    this.getExamineListData()
   },
   methods: {
+    // 筛选查询回调
     submitCallback(params) {
       console.log('筛选参数', params)
+    },
+    // 获取审批数据列表
+    async getExamineListData() {
+      let res = await getExamineList()
+      console.log('审批列表', res)
+      if (res.code === 200) {
+        this.examineList = res.result
+      }
+    },
+    // 审批列表卡片点击
+    examineItemClick(id) {
+      this.processId = id
+      this.getExamineInfo(id)
+    },
+    // 获取流程审批详情
+    async getExamineInfo(id) {
+      let res = await getExamineInfoById({ id })
+      console.log('获取流程审批详情', res)
     }
   }
 }
@@ -121,7 +153,7 @@ export default {
           .approval-item-tip {
             width: 30px;
             height: 30px;
-            line-height: 30px;
+            line-height: 28px;
             text-align: center;
             border-radius: 50%;
             border: 1px solid #e5e5e5;

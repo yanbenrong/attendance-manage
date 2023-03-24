@@ -5,7 +5,7 @@
  * @Description: 公出表单
  * @params: 
  * @Date: 2023-03-09 15:19:01
- * @LastEditTime: 2023-03-15 17:02:33
+ * @LastEditTime: 2023-03-24 16:58:52
 -->
 <template>
   <div class="onbusiness-form">
@@ -66,18 +66,26 @@
         <a-button type="primary" html-type="submit">
           提交
         </a-button>
-        <a-button :style="{ marginLeft: '8px' }" @click="handleReset">
-          重置
+        <a-button :style="{ marginLeft: '8px' }" @click="handleFormCancel">
+          取消
         </a-button>
       </a-form-item>
     </a-form>
+    <ApproverModal
+      :visible="ApproverModalVisible"
+      @handleOk="handleModalOk"
+      @handleCancel="handleModalCancel"
+    ></ApproverModal>
   </div>
 </template>
 
 <script>
 import { getBase64 } from '@/utils/attendanceUtils.js'
 import { attendanceOut } from '@/api/myAttendance.js'
+import ApproverModal from '../components/ApproverModal.vue'
+
 export default {
+  components: { ApproverModal },
   data() {
     return {
       form: this.$form.createForm(this, { name: 'onbusiness ' }),
@@ -90,9 +98,13 @@ export default {
           status: 'done',
           url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
         }
-      ] // 图片列表
+      ], // 图片列表
+      ApproverModalVisible: false, // 选择审批人弹窗
+      formValue: {}, // 表单值
+      approverInfo: {} // 审批人信息
     }
   },
+  inject: ['closeCurrent'],
   methods: {
     // 提交回调
     handleSubmit(e) {
@@ -100,23 +112,16 @@ export default {
       this.form.validateFields(async (err, values) => {
         if (!err) {
           console.log('Received values of form: ', values)
-          let { onbusinessPlace, explain, time } = values
-          let res = await attendanceOut({
-            outPlace: onbusinessPlace,
-            startDate: time[0].format('YYYY-MM-DD HH:MM:SS'),
-            endDate: time[1].format('YYYY-MM-DD HH:MM:SS'),
-            outHours: 8,
-            outDays: 1,
-            outReason: explain,
-            tenantId: 123
-          })
-          console.log('公出申请', res)
+          this.ApproverModalVisible = true
+          this.formValue = values
         }
       })
     },
-    // 重置回调
-    handleReset() {
-      this.form.resetFields()
+    // 取消回调
+    handleFormCancel() {
+      // this.form.resetFields()
+      this.$router.go(-1)
+      this.closeCurrent()
     },
     // 关闭预览弹窗
     handleCancel() {
@@ -133,6 +138,39 @@ export default {
     // 上传文件变化回调
     handleChange({ fileList }) {
       this.fileList = fileList
+    },
+    // 选择审批人 ok
+    handleModalOk(params) {
+      this.ApproverModalVisible = false
+      console.log('审批人信息', params)
+      this.approverInfo = params.pmUser
+      this.submitAttendanceOnbusiness()
+    },
+    // 选择审批人 cancel
+    handleModalCancel() {
+      this.ApproverModalVisible = false
+      this.$message.error('未选择审批人')
+      // this.handleReset()
+    },
+    // 提交公出申请
+    async submitAttendanceOnbusiness() {
+      let { onbusinessPlace, explain, time } = this.formValue
+      let res = await attendanceOut({
+        outPlace: onbusinessPlace,
+        startDate: time[0].format('YYYY-MM-DD HH:MM:SS'),
+        endDate: time[1].format('YYYY-MM-DD HH:MM:SS'),
+        outHours: 8,
+        outDays: 1,
+        outReason: explain,
+        tenantId: 123,
+        examineUserId: this.approverInfo.id,
+        examineUserName: this.approverInfo.realname
+      })
+      if (res.success) {
+        this.$message.success('补签数据保存成功，已进入审批流程')
+        this.handleFormCancel()
+      }
+      console.log('公出申请', res)
     }
   }
 }
@@ -140,6 +178,8 @@ export default {
 
 <style lang="less" scope>
 .onbusiness-form {
+  background-color: #fff;
+  padding: 20px;
   .form-title {
     font-size: 18px;
     font-weight: 600;

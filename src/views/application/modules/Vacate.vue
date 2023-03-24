@@ -5,7 +5,7 @@
  * @Description: 请假表单 
  * @params: 
  * @Date: 2023-03-09 15:18:11
- * @LastEditTime: 2023-03-15 17:02:09
+ * @LastEditTime: 2023-03-24 16:41:47
 -->
 <template>
   <div class="vacate-form">
@@ -82,11 +82,16 @@
         <a-button type="primary" html-type="submit">
           提交
         </a-button>
-        <a-button :style="{ marginLeft: '8px' }" @click="handleReset">
-          重置
+        <a-button :style="{ marginLeft: '8px' }" @click="handleFormCancel">
+          取消
         </a-button>
       </a-form-item>
     </a-form>
+    <ApproverModal
+      :visible="ApproverModalVisible"
+      @handleOk="handleModalOk"
+      @handleCancel="handleModalCancel"
+    ></ApproverModal>
     <!-- 各考勤专员邮箱    -->
     <a-drawer placement="right" :closable="false" :visible="drawerVisible" @close="onClose" :width="500">
       <template slot="title"><div class="drawer-title">查看各考勤专员邮箱(考勤专员联系表)</div></template>
@@ -107,7 +112,11 @@
 import { getBase64 } from '@/utils/attendanceUtils.js'
 import { vacateTypeTip, specialistMail } from './staticData'
 import { initDictOptions } from '@/components/dict/JDictSelectUtil'
+import ApproverModal from '../components/ApproverModal.vue'
+import { attendanceLeave } from '@/api/myAttendance.js'
+
 export default {
+  components: { ApproverModal },
   data() {
     return {
       form: this.$form.createForm(this, { name: 'onbusiness ' }),
@@ -125,9 +134,13 @@ export default {
       vacateType: '', // 当前请假类型
       vacateTypeTip, // 请假类型备注静态数据
       specialistMail, // 考勤专员邮箱数据
-      drawerVisible: false
+      drawerVisible: false, // 专员邮箱抽屉
+      ApproverModalVisible: false, // 选择审批人弹窗
+      formValue: {}, // 表单值
+      approverInfo: {} // 审批人信息
     }
   },
+  inject: ['closeCurrent'],
   created() {
     this.getLeaveTypeDict()
   },
@@ -138,12 +151,17 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           console.log('Received values of form: ', values)
+          // 选择审批人
+          this.ApproverModalVisible = true
+          this.formValue = values
         }
       })
     },
-    // 重置回调
-    handleReset() {
-      this.form.resetFields()
+    // 取消回调
+    handleFormCancel() {
+      // this.form.resetFields()
+      this.$router.go(-1)
+      this.closeCurrent()
     },
     // 关闭预览弹窗
     handleCancel() {
@@ -195,13 +213,46 @@ export default {
     showDrawer() {
       this.drawerVisible = true
     },
+    // 抽屉关闭
     onClose() {
       this.drawerVisible = false
     },
+    // 获取请假类型字典
     async getLeaveTypeDict() {
       let dict = await initDictOptions('leave_type')
       console.log('请假类型字典', dict)
       this.typeOption = dict.result
+    },
+    // 选择审批人 ok
+    handleModalOk(params) {
+      this.ApproverModalVisible = false
+      console.log('审批人信息', params)
+      this.approverInfo = params.pmUser
+      this.submitAttendanceVacate()
+    },
+    // 选择审批人 cancel
+    handleModalCancel() {
+      this.ApproverModalVisible = false
+      this.$message.error('未选择审批人')
+      // this.handleFormCancel()
+    },
+    // 提交请假申请
+    async submitAttendanceVacate() {
+      let { duration, explain, time, type } = this.formValue
+      let res = await attendanceLeave({
+        leaveStartTime: time[0].format('YYYY-MM-DD HH:MM:SS'),
+        leaveEndTime: time[1].format('YYYY-MM-DD HH:MM:SS'),
+        leaveType: type.key,
+        leaveHours: duration,
+        leaveRemake: explain,
+        examineUserId: this.approverInfo.id,
+        examineUserName: this.approverInfo.realname
+      })
+      console.log('请假申请', res)
+      if (res.success) {
+        this.$message.success('请假数据保存成功，已进入审批流程')
+        this.handleFormCancel()
+      }
     }
   }
 }
@@ -209,6 +260,8 @@ export default {
 
 <style lang="less" scope>
 .vacate-form {
+  background-color: #fff;
+  padding: 20px;
   .form-title {
     font-size: 18px;
     font-weight: 600;

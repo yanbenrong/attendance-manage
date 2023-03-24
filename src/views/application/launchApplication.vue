@@ -5,7 +5,7 @@
  * @Description: 
  * @params: 
  * @Date: 2023-03-09 14:42:35
- * @LastEditTime: 2023-03-21 09:52:28
+ * @LastEditTime: 2023-03-24 17:17:36
 -->
 <template>
   <div class="page-container launch-container">
@@ -17,40 +17,36 @@
         </a-button>
       </div>
     </div>
-    <div class="form">
+    <!-- <div class="form">
       <keep-alive>
         <component v-show="componentName" :is="componentName"></component>
       </keep-alive>
       <div v-show="!componentName" class="flex-center form-empty"><a-empty :description="false"></a-empty></div>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
-import Vacate from './modules/Vacate.vue'
-import Retroactive from './modules/Retroactive.vue'
-import Onbusiness from './modules/Onbusiness.vue'
 export default {
-  components: {
-    Vacate,
-    Retroactive,
-    Onbusiness
-  },
   data() {
     return {
       launchTypeBtn: [
-        { name: '请假', componentName: 'Vacate' },
-        { name: '补签', componentName: 'Retroactive' },
-        { name: '公出', componentName: 'Onbusiness' },
-        { name: '销假', componentName: '' },
-        { name: '夜班', componentName: '' },
-        { name: '打卡权限', componentName: '' }
+        { name: '请假', path: '/application/launchApplication/Vacate' },
+        { name: '补签', path: '/application/launchApplication/Retroactive' },
+        { name: '公出', path: '/application/launchApplication/Onbusiness' },
+        { name: '销假' },
+        { name: '夜班' },
+        { name: '打卡权限' }
       ],
       componentName: 'Vacate'
     }
   },
   methods: {
-    launchTypeChange({ componentName }) {
-      this.componentName = componentName
+    launchTypeChange({ path }) {
+      if (path) {
+        this.$router.push(path)
+      } else {
+        this.$message.info('待开发')
+      }
     }
   }
 }
