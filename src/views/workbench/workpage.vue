@@ -5,7 +5,7 @@
  * @Description: 工作台首页
  * @params: 
  * @Date: 2023-03-08 11:05:22
- * @LastEditTime: 2023-03-08 16:44:09
+ * @LastEditTime: 2023-03-28 15:02:46
 -->
 <template>
   <div class="workpage-container">
@@ -38,12 +38,12 @@ export default {
         {
           iconUrl: 'https://www.ctgpayroll.com/file/getfile/image/5eb380bcc17bbe3256abc27a?a=1',
           navTitle: '发起申请',
-          path: ''
+          path: '/application'
         },
         {
           iconUrl: 'https://www.ctgpayroll.com/file/getfile/image/5eb37741f3abfd2123b245eb?a=1',
           navTitle: '审批',
-          path: ''
+          path: '/approval'
         },
         {
           iconUrl: 'https://www.ctgpayroll.com/file/getfile/image/5fb1db27bf009c0b9afe76e0?a=1',
@@ -63,7 +63,7 @@ export default {
         {
           iconUrl: 'https://www.ctgpayroll.com/file/getfile/image/5fb47d3984a7400ce5c8223d?a=1',
           navTitle: '打卡地址',
-          path: ''
+          path: '/punchinAddress'
         },
         {
           iconUrl: 'https://s2.loli.net/2023/03/08/roIAlGpWfsj6eNV.png',
@@ -73,7 +73,7 @@ export default {
         {
           iconUrl: 'https://www.ctgpayroll.com/file/getfile/image/5eb37741da726721405e2850?a=1',
           navTitle: '假期池',
-          path: ''
+          path: '/holidayPool'
         }
       ]
     }

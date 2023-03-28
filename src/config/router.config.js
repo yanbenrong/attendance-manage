@@ -410,4 +410,8 @@ export const constantRouterMap = [
   //   path: '/application/launchApplication',
   //   component: () => import('@/views/application/launchApplication.vue')
   // }
+  // {
+  //   path: '/addressEntry',
+  //   component: () => import('@/views/punchInAddress/addressEntry/index.vue')
+  // }
 ]

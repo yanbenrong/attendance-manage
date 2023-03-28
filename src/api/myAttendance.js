@@ -1,4 +1,4 @@
-import { postAction, getAction } from '@/api/manage'
+import { postAction, getAction, putAction } from '@/api/manage'
 
 // 日考勤详情
 export const getDailyAttendance = params => postAction('/attendance/kqAttendanceSign/queryByDate', params)
@@ -26,8 +26,10 @@ export const getUserByDepid = params => getAction('/sys/user/queryUserByDepId', 
 
 // 审批列表
 export const getExamineList = params => getAction('/attendance/kqFlowMainProcess/examineList', params)
-// 审批列表
+// id查审批详情
 export const getExamineInfoById = params => getAction('/attendance/kqFlowMainProcess/queryById', params)
+// id查审批详情
+export const putExamine = params => putAction('/attendance/kqFlowMainProcess/examine', params)
 // 假期池
 export const getLeavePool = params => getAction('/attendance/kqLeavePool/list', params)
 
