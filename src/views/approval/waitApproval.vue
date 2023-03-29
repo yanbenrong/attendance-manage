@@ -149,7 +149,7 @@ export default {
     },
     // 获取审批数据列表
     async getExamineListData() {
-      let res = await getExamineList({ type: '02' })
+      let res = await getExamineList({ type: '01' })
       console.log('审批列表', res)
       if (res.code === 200) {
         this.examineList = res.result

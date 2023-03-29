@@ -5,7 +5,7 @@
  * @Description:
  * @params:
  * @Date: 2023-03-07 14:13:58
- * @LastEditTime: 2023-03-28 14:15:59
+ * @LastEditTime: 2023-03-28 18:35:58
  */
 import Vue from 'vue'
 import router from './router'
@@ -31,7 +31,7 @@ const whiteList = [
   // '/applicationRecord',
   // '/approval/waitApproval',
   // '/approval/alreadyApproval',
-  // '/addressEntry'
+  '/addressEntry'
 ] // no redirect whitelist
 whiteList.push(OAUTH2_LOGIN_PAGE_PATH)
 

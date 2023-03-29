@@ -377,7 +377,7 @@ export const constantRouterMap = [
   {
     path: '/404',
     component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
-  }
+  },
   // {
   //   path: '/attendance/day',
   //   component: () => import('@/views/attendance/dailyAttendance/dailyAttendance.vue')
@@ -410,8 +410,8 @@ export const constantRouterMap = [
   //   path: '/application/launchApplication',
   //   component: () => import('@/views/application/launchApplication.vue')
   // }
-  // {
-  //   path: '/addressEntry',
-  //   component: () => import('@/views/punchInAddress/addressEntry/index.vue')
-  // }
+  {
+    path: '/addressEntry',
+    component: () => import('@/views/punchInAddress/addressEntry/index.vue')
+  }
 ]

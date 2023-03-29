@@ -1,3 +1,12 @@
+<!--
+ * @Author: YanBenrong
+ * @LastEdit: YanBenrong
+ * @LastEditors: YanBenrong
+ * @Description: 
+ * @params: 
+ * @Date: 2023-03-27 14:45:55
+ * @LastEditTime: 2023-03-29 18:44:04
+-->
 <template>
   <div class="page-container addressEntry-container">
     <PageView></PageView>
@@ -7,14 +16,18 @@
         添加
       </a-button>
     </div>
-    <a-table :columns="columns" :data-source="data" bordered>
-      <template v-for="col in ['address', 'lng', 'lat', 'raduis']" :slot="col" slot-scope="text, record, index">
+    <a-table :columns="columns" :data-source="data" :rowKey="record => record.id" bordered>
+      <template
+        v-for="col in ['address', 'longitude', 'latitude', 'raduis']"
+        :slot="col"
+        slot-scope="text, record, index"
+      >
         <div :key="col">
           <a-input
             v-if="record.editable"
             style="margin: -5px 0"
             :value="text"
-            @change="e => handleChange(e.target.value, record.key, col)"
+            @change="e => handleTableChange(e.target.value, record.id, col)"
           />
           <template v-else>
             {{ text }}
@@ -24,13 +37,14 @@
       <template slot="operation" slot-scope="text, record, index">
         <div class="editable-row-operations">
           <span v-if="record.editable">
-            <a @click="() => save(record.key)">Save</a>
-            <a-popconfirm title="Sure to cancel?" @confirm="() => cancel(record.key)">
-              <a>Cancel</a>
+            <a @click="() => save(record.id)">保存</a>
+            <a-popconfirm title="Sure to cancel?" @confirm="() => cancel(record.id)">
+              <a>取消</a>
             </a-popconfirm>
           </span>
           <span v-else>
-            <a :disabled="editingKey !== ''" @click="() => edit(record.key)">Edit</a>
+            <a :disabled="editingKey !== ''" @click="() => edit(record.id)">修改</a>
+            <a :disabled="editingKey !== ''" @click="() => deleteRecord(record.id)">删除</a>
           </span>
         </div>
       </template>
@@ -72,6 +86,7 @@ import PageView from '@/components/layouts/PageView'
 import STable from '@/components/table/'
 
 import { getLocationSuggestion, getLocationSearch } from '@/api/bmap.js'
+import { getSignAddressList, postAddAddress, editAddress, deleteAddress } from '@/api/myAttendance.js'
 
 const data = []
 for (let i = 0; i < 10; i++) {
@@ -88,11 +103,11 @@ export default {
   data() {
     return {
       map: null,
-      clickPoint: null, // 当前点击的点
+      clickPoint: null, // 当前选点的点的经纬度信息
       dataSource: [], // 搜索下拉的数据
       inputValue: '',
       currentPointInfo: {}, // 当前选点的信息
-      isShowAddresslist: false,
+      isShowAddresslist: false, // 地点检索提示
       // 表头
       columns: [
         {
@@ -102,13 +117,13 @@ export default {
         },
         {
           title: '经度',
-          dataIndex: 'lng',
-          scopedSlots: { customRender: 'lng' }
+          dataIndex: 'longitude',
+          scopedSlots: { customRender: 'longitude' }
         },
         {
           title: '纬度',
-          dataIndex: 'lat',
-          scopedSlots: { customRender: 'lat' }
+          dataIndex: 'latitude',
+          scopedSlots: { customRender: 'latitude' }
         },
         {
           title: '有效范围',
@@ -121,10 +136,14 @@ export default {
           scopedSlots: { customRender: 'operation' }
         }
       ],
-      data,
+      data: [], // table数据
+      cacheData: [], // 缓存数据
       editingKey: '',
-      formModalVisible: false
+      formModalVisible: false // 添加打卡地址弹窗
     }
+  },
+  created() {
+    this.getAddressList()
   },
   mounted() {
     // this.initMap()
@@ -189,6 +208,15 @@ export default {
         this.queryAddressByLocation(pointObj)
       })
     },
+    // 获取打卡地址分页列表
+    async getAddressList() {
+      const res = await getSignAddressList()
+      console.log('获取打卡地址分页列表', res)
+      if (res.code === 200) {
+        this.data = res.result.records
+        this.cacheData = res.result.records.map(item => ({ ...item }))
+      }
+    },
     async queryAddressByLocation(location) {
       const pois = [
         '房地产',
@@ -252,32 +280,108 @@ export default {
     focus() {
       this.isShowAddresslist = true
     },
+    // 点击添加按钮
     addClick() {
       this.formModalVisible = true
       this.$nextTick(() => {
         this.initMap()
       })
     },
-    handleOk() {
+    // model ok
+    async handleOk() {
       this.formModalVisible = false
+      const params = {
+        address: this.currentPointInfo.name,
+        latitude: this.clickPoint.lat,
+        longitude: this.clickPoint.lng,
+        raduis: 250
+      }
+      const res = await postAddAddress(params)
+      console.log('添加考勤地点', res)
+      if (res.code === 200) {
+        this.$message.success('添加成功')
+        this.getAddressList()
+      }
     },
+    // model cancel
     handleCancel() {
       this.formModalVisible = false
       this.currentPointInfo = {}
       this.clickPoint = {}
     },
-    handleChange(value, key, column) {},
-    edit(key) {
+
+    edit(id) {
       const newData = [...this.data]
-      const target = newData.find(item => key === item.key)
-      this.editingKey = key
+      const target = newData.find(item => id === item.id)
+      this.editingKey = id
       if (target) {
         target.editable = true
         this.data = newData
       }
     },
-    save(key) {},
-    cancel(key) {}
+    // 删除
+    async deleteRecord(id) {
+      const params = {
+        id
+      }
+      const res = await deleteAddress(params)
+      console.log('删除地址', res)
+
+      if (res.code === 200) {
+        this.$message.success('删除成功')
+        this.getAddressList()
+      }
+    },
+    // 列表编辑输入框change
+    handleTableChange(value, id, column) {
+      console.log('列表编辑输入框change', value, id, column)
+      const newData = [...this.data]
+      const target = newData.find(item => id === item.id)
+      if (target) {
+        target[column] = value
+        this.data = newData
+      }
+    },
+    async save(id) {
+      const newData = [...this.data]
+      // const newCacheData = [...this.cacheData]
+      const target = newData.find(item => id === item.id)
+      console.log('保存target', target)
+      const params = {
+        id: target.id,
+        latitude: Number(target.latitude),
+        longitude: Number(target.longitude),
+        raduis: Number(target.raduis),
+        address: target.address
+      }
+      const res = await editAddress(params)
+      console.log('保存res', res)
+      if (res.code === 200) {
+        this.$message.success('修改成功')
+        this.getAddressList()
+      }
+      // const targetCache = newCacheData.find(item => key === item.key)
+      // if (target && targetCache) {
+      //   delete target.editable
+      //   this.data = newData
+      //   Object.assign(targetCache, target)
+      //   this.cacheData = newCacheData
+      // }
+      this.editingKey = ''
+    },
+    cancel(id) {
+      const newData = [...this.data]
+      const target = newData.find(item => id === item.id)
+      this.editingKey = ''
+      if (target) {
+        Object.assign(
+          target,
+          this.cacheData.find(item => id === item.id)
+        )
+        delete target.editable
+        this.data = newData
+      }
+    }
   }
 }
 </script>

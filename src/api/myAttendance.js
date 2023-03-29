@@ -1,4 +1,4 @@
-import { postAction, getAction, putAction } from '@/api/manage'
+import { postAction, getAction, putAction, deleteAction } from '@/api/manage'
 
 // 日考勤详情
 export const getDailyAttendance = params => postAction('/attendance/kqAttendanceSign/queryByDate', params)
@@ -32,4 +32,13 @@ export const getExamineInfoById = params => getAction('/attendance/kqFlowMainPro
 export const putExamine = params => putAction('/attendance/kqFlowMainProcess/examine', params)
 // 假期池
 export const getLeavePool = params => getAction('/attendance/kqLeavePool/list', params)
+
+// 打卡地址分页列表
+export const getSignAddressList = params => getAction('/attendance/kqCompanySignAddress/list', params)
+// 添加公司考勤地址
+export const postAddAddress = params => postAction('/attendance/kqCompanySignAddress/add', params)
+// 编辑公司考勤地址
+export const editAddress = params => postAction('/attendance/kqCompanySignAddress/edit', params)
+// 删除公司考勤地址
+export const deleteAddress = params => deleteAction('/attendance/kqCompanySignAddress/delete', params)
 

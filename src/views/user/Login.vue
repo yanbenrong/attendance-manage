@@ -1,7 +1,13 @@
 <template>
   <div class="main">
     <a-form-model class="user-layout-login" @keyup.enter.native="handleSubmit">
-      <a-tabs
+      <login-account
+        ref="alogin"
+        @validateFail="validateFail"
+        @success="requestSuccess"
+        @fail="requestFailed"
+      ></login-account>
+      <!-- <a-tabs
         :activeKey="customActiveKey"
         :tabBarStyle="{ textAlign: 'center', borderBottom: 'unset' }"
         @change="handleTabClick"
@@ -23,16 +29,16 @@
             @fail="requestFailed"
           ></login-phone>
         </a-tab-pane>
-      </a-tabs>
+      </a-tabs> -->
 
       <a-form-model-item>
         <a-checkbox @change="handleRememberMeChange" default-checked>自动登录</a-checkbox>
-        <router-link :to="{ name: 'alteration' }" class="forge-password" style="float: right;">
+        <!-- <router-link :to="{ name: 'alteration' }" class="forge-password" style="float: right;">
           忘记密码
         </router-link>
         <router-link :to="{ name: 'register' }" class="forge-password" style="float: right;margin-right: 10px">
           注册账户
-        </router-link>
+        </router-link> -->
       </a-form-model-item>
 
       <a-form-item style="margin-top:24px">
@@ -56,7 +62,7 @@
       @cancel="stepCaptchaCancel"
     ></two-step-captcha>
     <login-select-tenant ref="loginSelect" @success="loginSelectOk"></login-select-tenant>
-    <third-login ref="thirdLogin"></third-login>
+    <!-- <third-login ref="thirdLogin"></third-login> -->
   </div>
 </template>
 
