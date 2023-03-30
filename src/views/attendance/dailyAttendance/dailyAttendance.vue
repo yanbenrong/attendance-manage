@@ -5,7 +5,7 @@
  * @Description: 日考勤记录
  * @params: 
  * @Date: 2023-03-08 11:05:22
- * @LastEditTime: 2023-03-22 17:19:55
+ * @LastEditTime: 2023-03-30 17:23:48
 -->
 <template>
   <div class="dailyAttendance-container page-container">
@@ -30,11 +30,19 @@
         <div v-if="!isEmptyData" class="info-data">
           <p>
             <span class="mr-20">08：30：00</span><span class="mr-20">上班</span
-            ><span class="mr-20">打卡(08：45：23)</span>
+            ><span class="mr-20"
+              >{{ goWorkAbnormal }} ({{
+                (attendanceSignInfo.goWork && attendanceSignInfo.goWork.signTime) || '--'
+              }})</span
+            >
           </p>
           <p>
             <span class="mr-20">18：00：00</span><span class="mr-20">下班</span
-            ><span class="mr-20">打卡(08：45：23)</span>
+            ><span class="mr-20"
+              >{{ afterWorkAbnormal }} ({{
+                (attendanceSignInfo.afterWork && attendanceSignInfo.afterWork.signTime) || '--'
+              }})</span
+            >
           </p>
           <hr />
         </div>
@@ -55,7 +63,9 @@ export default {
       nowMonth: '',
       nowDate: '', // 当前时间
       ycData: [], // 考勤异常数据
-      isEmptyData: false
+      isEmptyData: false,
+      attendanceSignInfo: {}, // 打卡数据
+      abnormalTypeArr: [] // 异常类型数组
     }
   },
   created() {
@@ -63,6 +73,20 @@ export default {
     this.initNowDate()
     this.getData(this.nowDate)
     this.getAbnormalData(this.nowMonth)
+  },
+  computed: {
+    goWorkAbnormal() {
+      if (this.abnormalTypeArr.includes('00')) {
+        return '迟到'
+      }
+      return '打卡'
+    },
+    afterWorkAbnormal() {
+      if (this.abnormalTypeArr.includes('01')) {
+        return '早退'
+      }
+      return '打卡'
+    }
   },
   methods: {
     // 初始化当前日期
@@ -173,11 +197,33 @@ export default {
     },
     // 获取日考勤数据
     async getData(date) {
+      // 重置
+      this.attendanceSignInfo = {}
+      this.abnormalTypeArr = []
       this.isEmptyData = true
       let res = await getDailyAttendance({ signDate: date })
       console.log('😍2023-03-13 获取日考勤数据', res)
-      if (res.code == 200) {
-        this.isEmptyData = false
+      if (res.code === 200) {
+        if (res.result.kqAttendanceSign) {
+          this.isEmptyData = false
+          res.result.kqAttendanceSign.forEach(ele => {
+            // 上班
+            if (ele.signType === 0) {
+              this.attendanceSignInfo.goWork = {
+                signTime: ele.signTime.split(' ')[1]
+              }
+            } else {
+              this.attendanceSignInfo.afterWork = {
+                signTime: ele.signTime.split(' ')[1]
+              }
+            }
+          })
+        }
+        if (res.result.kqAttendanceAbnormal) {
+          res.result.kqAttendanceAbnormal.forEach(ele => {
+            this.abnormalTypeArr.push(ele.abnormalType)
+          })
+        }
       } else {
         this.isEmptyData = true
       }

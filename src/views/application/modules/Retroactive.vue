@@ -5,7 +5,7 @@
  * @Description: 补签表单
  * @params: 
  * @Date: 2023-03-09 15:17:14
- * @LastEditTime: 2023-03-24 16:58:58
+ * @LastEditTime: 2023-03-30 15:54:59
 -->
 <template>
   <div class="retroactive-form">
@@ -113,7 +113,7 @@ export default {
         examineUserName: this.approverInfo.realname
       })
       if (res.success) {
-        this.$message.success('补签数据保存成功，已进入审批流程')
+        this.$message.success('补签申请保存成功，已进入审批流程')
         this.handleReset()
       }
       console.log('补签申请', res)

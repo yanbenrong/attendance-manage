@@ -5,7 +5,7 @@
  * @Description: 公出表单
  * @params: 
  * @Date: 2023-03-09 15:19:01
- * @LastEditTime: 2023-03-24 16:58:52
+ * @LastEditTime: 2023-03-30 15:57:30
 -->
 <template>
   <div class="onbusiness-form">
@@ -27,11 +27,13 @@
           format="YYYY-MM-DD HH:mm:ss"
           v-decorator="['time', { rules: [{ required: true, message: '请选择开始时间和结束时间!' }] }]"
           :placeholder="['开始时间', '结束时间']"
+          @ok="datePickerok"
         />
       </a-form-item>
       <a-form-item label="公出时长">
         <a-input
           placeholder="公出时长"
+          :disabled="true"
           v-decorator="['duration', { rules: [{ required: true, message: '请填写公出时长!' }] }]"
         />
       </a-form-item>
@@ -44,24 +46,13 @@
         />
       </a-form-item>
       <a-form-item label="附件" help="仅能上传图片">
-        <a-upload
-          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-          list-type="picture-card"
-          :file-list="fileList"
-          @preview="handlePreview"
-          @change="handleChange"
-        >
-          <div v-if="fileList.length < 8">
-            <a-icon type="plus" />
-            <div class="ant-upload-text">
-              Upload
-            </div>
-          </div>
-        </a-upload>
-        <a-modal :bodyStyle="{ padding: '25px' }" :visible="previewVisible" :footer="null" @cancel="handleCancel">
-          <img alt="example" style="width: 100%" :src="previewImage" />
-        </a-modal>
-      </a-form-item>
+        <j-image-upload
+          v-decorator="['filePath', {}]"
+          bizPath="scott/pic"
+          :isMultiple="true"
+          :maxLength="2"
+        ></j-image-upload
+      ></a-form-item>
       <a-form-item :wrapper-col="{ span: 6, offset: 3 }">
         <a-button type="primary" html-type="submit">
           提交
@@ -81,24 +72,16 @@
 
 <script>
 import { getBase64 } from '@/utils/attendanceUtils.js'
-import { attendanceOut } from '@/api/myAttendance.js'
+import { attendanceOut, getWorkHours } from '@/api/myAttendance.js'
 import ApproverModal from '../components/ApproverModal.vue'
+import JImageUpload from '@/components/jeecg/JImageUpload'
+import { getFileAccessHttpUrl } from '@/api/manage'
 
 export default {
-  components: { ApproverModal },
+  components: { ApproverModal, JImageUpload },
   data() {
     return {
       form: this.$form.createForm(this, { name: 'onbusiness ' }),
-      previewVisible: false, // 图片预览
-      previewImage: '', // 预览图片数据
-      fileList: [
-        {
-          uid: '-1',
-          name: 'image.png',
-          status: 'done',
-          url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-        }
-      ], // 图片列表
       ApproverModalVisible: false, // 选择审批人弹窗
       formValue: {}, // 表单值
       approverInfo: {} // 审批人信息
@@ -123,22 +106,7 @@ export default {
       this.$router.go(-1)
       this.closeCurrent()
     },
-    // 关闭预览弹窗
-    handleCancel() {
-      this.previewVisible = false
-    },
-    // 预览回调
-    async handlePreview(file) {
-      if (!file.url && !file.preview) {
-        file.preview = await getBase64(file.originFileObj)
-      }
-      this.previewImage = file.url || file.preview
-      this.previewVisible = true
-    },
-    // 上传文件变化回调
-    handleChange({ fileList }) {
-      this.fileList = fileList
-    },
+
     // 选择审批人 ok
     handleModalOk(params) {
       this.ApproverModalVisible = false
@@ -152,25 +120,55 @@ export default {
       this.$message.error('未选择审批人')
       // this.handleReset()
     },
+    // 文件url处理
+    handleFile(file) {
+      if (file) {
+        let fileList = file.split(',')
+        let newarr = fileList.map(element => {
+          return getFileAccessHttpUrl(element)
+        })
+        console.log('处理后的数组', newarr)
+        return newarr.join(',')
+      }
+      return ''
+    },
     // 提交公出申请
     async submitAttendanceOnbusiness() {
-      let { onbusinessPlace, explain, time } = this.formValue
-      let res = await attendanceOut({
+      let { onbusinessPlace, explain, time, filePath } = this.formValue
+      let params = {
         outPlace: onbusinessPlace,
         startDate: time[0].format('YYYY-MM-DD HH:MM:SS'),
         endDate: time[1].format('YYYY-MM-DD HH:MM:SS'),
         outHours: 8,
         outDays: 1,
         outReason: explain,
-        tenantId: 123,
         examineUserId: this.approverInfo.id,
-        examineUserName: this.approverInfo.realname
-      })
+        examineUserName: this.approverInfo.realname,
+        filePath: this.handleFile(filePath)
+      }
+      let res = await attendanceOut(params)
       if (res.success) {
-        this.$message.success('补签数据保存成功，已进入审批流程')
+        this.$message.success('公出申请保存成功，已进入审批流程')
         this.handleFormCancel()
       }
       console.log('公出申请', res)
+    },
+    // 日期选择ok
+    datePickerok(date) {
+      let params = {
+        startTime: date[0].format('YYYY-MM-DD HH:MM:SS'),
+        endTime: date[1].format('YYYY-MM-DD HH:MM:SS')
+      }
+      console.log('日期选择ok params', params)
+      this.getWorkHoursFunc(params)
+    },
+    // 获取请假时长
+    async getWorkHoursFunc(params) {
+      const res = await getWorkHours(params)
+      console.log('获取请假时长', res)
+      if (res.code === 200) {
+        this.form.setFieldsValue({ duration: res.result })
+      }
     }
   }
 }

@@ -5,7 +5,7 @@
  * @Description: 请假表单 
  * @params: 
  * @Date: 2023-03-09 15:18:11
- * @LastEditTime: 2023-03-24 16:41:47
+ * @LastEditTime: 2023-03-30 15:57:02
 -->
 <template>
   <div class="vacate-form">
@@ -37,11 +37,13 @@
           format="YYYY-MM-DD HH:mm:ss"
           v-decorator="['time', { rules: [{ required: true, message: '请选择开始时间和结束时间!' }] }]"
           :placeholder="['开始时间', '结束时间']"
+          @ok="datePickerok"
         />
       </a-form-item>
       <a-form-item label="请假时长">
         <a-input
           placeholder="请假时长"
+          :disabled="true"
           v-decorator="['duration', { rules: [{ required: true, message: '请填写请假时长!' }] }]"
         />
       </a-form-item>
@@ -54,23 +56,13 @@
         />
       </a-form-item>
       <a-form-item label="附件">
-        <a-upload
-          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-          list-type="picture-card"
-          :file-list="fileList"
-          @preview="handlePreview"
-          @change="handleChange"
-        >
-          <div v-if="fileList.length < 8">
-            <a-icon type="plus" />
-            <div class="ant-upload-text">
-              Upload
-            </div>
-          </div>
-        </a-upload>
-        <a-modal :bodyStyle="{ padding: '25px' }" :visible="previewVisible" :footer="null" @cancel="handleCancel">
-          <img alt="example" style="width: 100%" :src="previewImage" />
-        </a-modal>
+        <j-image-upload
+          v-decorator="['filePath', {}]"
+          bizPath="scott/pic"
+          :isMultiple="true"
+          :maxLength="2"
+        ></j-image-upload>
+
         <div style="line-height: 21px;">
           上传图片
           <span v-if="vacateTypeTip[vacateType] && vacateTypeTip[vacateType].uploadTip" class="red-font"
@@ -112,24 +104,16 @@
 import { getBase64 } from '@/utils/attendanceUtils.js'
 import { vacateTypeTip, specialistMail } from './staticData'
 import { initDictOptions } from '@/components/dict/JDictSelectUtil'
+import JImageUpload from '@/components/jeecg/JImageUpload'
 import ApproverModal from '../components/ApproverModal.vue'
-import { attendanceLeave } from '@/api/myAttendance.js'
+import { attendanceLeave, getWorkHours } from '@/api/myAttendance.js'
+import { getFileAccessHttpUrl } from '@/api/manage'
 
 export default {
-  components: { ApproverModal },
+  components: { ApproverModal, JImageUpload },
   data() {
     return {
       form: this.$form.createForm(this, { name: 'onbusiness ' }),
-      previewVisible: false, // 图片预览
-      previewImage: '', // 预览图片数据
-      fileList: [
-        // {
-        //   uid: '-1',
-        //   name: 'image.png',
-        //   status: 'done',
-        //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-        // }
-      ], // 附件图片列表
       typeOption: [],
       vacateType: '', // 当前请假类型
       vacateTypeTip, // 请假类型备注静态数据
@@ -163,23 +147,7 @@ export default {
       this.$router.go(-1)
       this.closeCurrent()
     },
-    // 关闭预览弹窗
-    handleCancel() {
-      this.previewVisible = false
-    },
-    // 预览回调
-    async handlePreview(file) {
-      if (!file.url && !file.preview) {
-        file.preview = await getBase64(file.originFileObj)
-      }
-      this.previewImage = file.url || file.preview
-      this.previewVisible = true
-    },
-    // 上传文件变化回调
-    handleChange({ fileList }) {
-      console.log('文件', fileList)
-      this.fileList = fileList
-    },
+
     // 请假类型选择回调
     vacateTypeChange(value) {
       console.log('请假类型change', value)
@@ -236,22 +204,53 @@ export default {
       this.$message.error('未选择审批人')
       // this.handleFormCancel()
     },
+    // 文件url处理
+    handleFile(file) {
+      if (file) {
+        let fileList = file.split(',')
+        let newarr = fileList.map(element => {
+          return getFileAccessHttpUrl(element)
+        })
+        console.log('处理后的数组', newarr)
+        return newarr.join(',')
+      }
+      return ''
+    },
     // 提交请假申请
     async submitAttendanceVacate() {
-      let { duration, explain, time, type } = this.formValue
-      let res = await attendanceLeave({
+      let { duration, explain, time, type, filePath } = this.formValue
+      const params = {
         leaveStartTime: time[0].format('YYYY-MM-DD HH:MM:SS'),
         leaveEndTime: time[1].format('YYYY-MM-DD HH:MM:SS'),
         leaveType: type.key,
         leaveHours: duration,
         leaveRemake: explain,
         examineUserId: this.approverInfo.id,
-        examineUserName: this.approverInfo.realname
-      })
+        examineUserName: this.approverInfo.realname,
+        filePath: this.handleFile(filePath)
+      }
+      let res = await attendanceLeave(params)
       console.log('请假申请', res)
       if (res.success) {
-        this.$message.success('请假数据保存成功，已进入审批流程')
+        this.$message.success('请假申请保存成功，已进入审批流程')
         this.handleFormCancel()
+      }
+    },
+    // 日期选择ok
+    datePickerok(date) {
+      let params = {
+        startTime: date[0].format('YYYY-MM-DD HH:MM:SS'),
+        endTime: date[1].format('YYYY-MM-DD HH:MM:SS')
+      }
+      console.log('日期选择ok params', params)
+      this.getWorkHoursFunc(params)
+    },
+    // 获取请假时长
+    async getWorkHoursFunc(params) {
+      const res = await getWorkHours(params)
+      console.log('获取请假时长', res)
+      if (res.code === 200) {
+        this.form.setFieldsValue({ duration: res.result })
       }
     }
   }

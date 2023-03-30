@@ -5,21 +5,22 @@
  * @Description: 假期池
  * @params: 
  * @Date: 2023-03-09 11:06:41
- * @LastEditTime: 2023-03-14 17:03:29
+ * @LastEditTime: 2023-03-30 17:55:20
 -->
 <template>
   <div class="holiday-container page-container">
     <div class="box-item">
       <div class="box-header flex-left">
         <img class="header-icon" src="@/assets/newyear.png" alt="" />
-        <span class="header-title">剩余年假5天</span>
+        <span class="header-title">剩余年假{{ annualLeaveInfo.residueHours || '--' }}小时</span>
       </div>
       <div class="box-body">
-        <p>去年结转：</p>
-        <p>当前可休：</p>
+        <p>去年结转：{{ annualLeaveInfo.restHours || '--' }} 小时</p>
+        <p>今年已释放：{{ annualLeaveInfo.annualLeave || '--' }} 小时</p>
+        <p>当前可休：{{ annualLeaveInfo.residueHours || '--' }} 小时</p>
       </div>
     </div>
-    <div class="box-item">
+    <!-- <div class="box-item">
       <div class="box-header flex-left">
         <img class="header-icon" src="@/assets/dayoff.png" alt="" />
         <span class="header-title">剩余年假5天</span>
@@ -28,7 +29,7 @@
         <p>去年结转：</p>
         <p>当前可休：</p>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -36,11 +37,16 @@
 import { getLeavePool } from '@/api/myAttendance.js'
 export default {
   data() {
-    return {}
+    return {
+      annualLeaveInfo: {}
+    }
   },
   async created() {
     let res = await getLeavePool()
     console.log('😍2023-03-13 假期池res', res)
+    if (res.code === 200) {
+      res.result.length > 0 && (this.annualLeaveInfo = res.result[0])
+    }
   }
 }
 </script>

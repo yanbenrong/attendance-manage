@@ -145,6 +145,18 @@ export default {
       if (res.result) {
         this.processInfo = res.result
       }
+    },
+    // 选择审批人 ok
+    handleModalOk(params) {
+      this.ApproverModalVisible = false
+      console.log('审批人信息', params)
+      this.approverInfo = params.pmUser
+    },
+    // 选择审批人 cancel
+    handleModalCancel() {
+      this.ApproverModalVisible = false
+      this.$message.error('未选择审批人')
+      // this.handleReset()
     }
   }
 }
