@@ -386,10 +386,14 @@ export const constantRouterMap = [
   //   path: '/attendance/month',
   //   component: () => import('@/views/attendance/monthlyAttendance/monthlyAttendance.vue')
   // },
-  // {
-  //   path: '/applicationRecord',
-  //   component: () => import('@/views/applicationRecord/applicationRecord.vue')
-  // },
+  {
+    path: '/applicationRecord',
+    component: () => import('@/views/applicationRecord/applicationRecord.vue')
+  },
+  {
+    path: '/applicationRecord/applicationDetail',
+    component: () => import('@/views/applicationRecord/applicationDetail.vue')
+  },
   // {
   //   path: '/approval/waitApproval',
   //   component: () => import('@/views/approval/waitApproval.vue')

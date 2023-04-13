@@ -2,180 +2,184 @@
 export const casualLeaveColumn = [
   {
     title: '姓名',
-    dataIndex: 'name'
+    dataIndex: 'userName'
   },
   {
     title: '请假类型',
-    dataIndex: 'type'
+    dataIndex: 'leaveType'
   },
   {
     title: '开始时间',
-    dataIndex: 'startTime'
+    dataIndex: 'leaveStartTime'
   },
   {
     title: '结束时间',
-    dataIndex: 'endTime'
+    dataIndex: 'leaveEndTime'
   },
   {
     title: '请假时长',
-    dataIndex: 'duration'
+    dataIndex: 'leaveHours'
   },
   {
     title: '申请时间',
-    dataIndex: 'applyDate'
+    dataIndex: 'createdDate'
   },
   {
     title: '审批状态',
-    dataIndex: 'state'
+    dataIndex: 'examineStatus'
   },
   {
     title: '审批人',
-    dataIndex: 'approver'
+    dataIndex: 'examineUserName'
   },
   {
     title: '请假原因',
-    dataIndex: 'reason'
+    dataIndex: 'leaveRemake'
   },
   {
     title: '流水号',
-    dataIndex: 'SerialNumber'
+    dataIndex: 'processId'
   },
   {
     title: '操作',
-    dataIndex: 'action'
+    dataIndex: 'action',
+    scopedSlots: { customRender: 'action' }
   }
 ]
 // 补休表格column
 export const compensatoryLeaveColumn = [
   {
     title: '姓名',
-    dataIndex: 'name'
+    dataIndex: 'userName'
   },
   {
     title: '请假类型',
-    dataIndex: 'type'
+    dataIndex: 'leaveType'
   },
   {
     title: '开始时间',
-    dataIndex: 'startTime'
+    dataIndex: 'leaveStartTime'
   },
   {
     title: '结束时间',
-    dataIndex: 'endTime'
+    dataIndex: 'leaveEndTime'
   },
   {
     title: '请假时长',
-    dataIndex: 'duration'
+    dataIndex: 'leaveHours'
   },
   {
     title: '申请时间',
-    dataIndex: 'applyDate'
+    dataIndex: 'createdDate'
   },
   {
     title: '审批状态',
-    dataIndex: 'state'
+    dataIndex: 'examineStatus'
   },
   {
     title: '审批人',
-    dataIndex: 'approver'
+    dataIndex: 'examineUserName'
   },
   {
     title: '请假原因',
-    dataIndex: 'reason'
+    dataIndex: 'leaveRemake'
   },
   {
     title: '流水号',
-    dataIndex: 'SerialNumber'
+    dataIndex: 'processId'
   },
   {
     title: '操作',
-    dataIndex: 'action'
+    dataIndex: 'action',
+    scopedSlots: { customRender: 'action' }
   }
 ]
 // 补签表格column
 export const retroactiveColumn = [
   {
     title: '姓名',
-    dataIndex: 'name'
+    dataIndex: 'userName'
   },
   {
     title: '申请类型',
-    dataIndex: 'type'
+    dataIndex: 'leaveType'
   },
   {
     title: '补签时间',
-    dataIndex: 'retroactiveTime'
+    dataIndex: 'createdDate'
   },
-  {
-    title: '补签类型',
-    dataIndex: 'retroactiveType'
-  },
+  // {
+  //   title: '补签类型',
+  //   dataIndex: 'leaveType'
+  // },
   {
     title: '审批状态',
-    dataIndex: 'state'
+    dataIndex: 'examineStatus'
   },
   {
     title: '审批人',
-    dataIndex: 'approver'
+    dataIndex: 'examineUserName'
   },
   {
     title: '补签原因',
-    dataIndex: 'retroactiveReason'
+    dataIndex: 'leaveRemake'
   },
   {
     title: '操作',
-    dataIndex: 'action'
+    dataIndex: 'action',
+    scopedSlots: { customRender: 'action' }
   }
 ]
 // 公出表格column
 export const onBusinessColumn = [
   {
     title: '姓名',
-    dataIndex: 'name'
+    dataIndex: 'userName'
   },
   {
     title: '申请类型',
-    dataIndex: 'type'
+    dataIndex: 'leaveType'
   },
   {
     title: '公出地点',
-    dataIndex: 'place'
+    dataIndex: 'outPlace'
   },
   {
     title: '开始时间',
-    dataIndex: 'startTime'
+    dataIndex: 'leaveStartTime'
   },
   {
     title: '结束时间',
-    dataIndex: 'endTime'
+    dataIndex: 'leaveEndTime'
   },
   {
     title: '公出时长',
-    dataIndex: 'duration'
+    dataIndex: 'leaveHours'
   },
   {
     title: '申请时间',
-    dataIndex: 'applyDate'
+    dataIndex: 'createdDate'
   },
   {
     title: '审批状态',
-    dataIndex: 'state'
+    dataIndex: 'examineStatus'
   },
   {
     title: '审批人',
-    dataIndex: 'approver'
+    dataIndex: 'examineUserName'
   },
   {
     title: '公出原因',
-    dataIndex: 'reason'
+    dataIndex: 'leaveRemake'
   },
   {
     title: '流水号',
-    dataIndex: 'SerialNumber'
+    dataIndex: 'processId'
   },
   {
     title: '操作',
-    dataIndex: 'action'
+    dataIndex: 'action',
+    scopedSlots: { customRender: 'action' }
   }
 ]
 

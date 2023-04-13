@@ -5,7 +5,7 @@
  * @Description:
  * @params:
  * @Date: 2023-03-07 14:13:58
- * @LastEditTime: 2023-03-28 18:35:58
+ * @LastEditTime: 2023-03-31 14:15:53
  */
 import Vue from 'vue'
 import router from './router'
@@ -28,7 +28,8 @@ const whiteList = [
   '/classes', // 开发
   // '/holidayPool', // 开发
   // '/application/launchApplication', // 开发
-  // '/applicationRecord',
+  '/applicationRecord',
+  '/applicationRecord/applicationDetail',
   // '/approval/waitApproval',
   // '/approval/alreadyApproval',
   '/addressEntry'
@@ -80,10 +81,10 @@ router.beforeEach((to, from, next) => {
             })
           })
           .catch(() => {
-            /* notification.error({
+            notification.error({
               message: '系统提示',
               description: '请求用户信息失败，请重试！'
-            })*/
+            })
             store.dispatch('Logout').then(() => {
               next({ path: '/user/login', query: { redirect: to.fullPath } })
             })

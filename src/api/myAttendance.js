@@ -19,6 +19,12 @@ export const attendanceLeave = params => postAction('attendance/kqAttendanceLeav
 export const attendanceOut = params => postAction('attendance/kqAttendanceOut/add', params)
 // 获取请假时长
 export const getWorkHours = params => postAction('/attendance/kqAttendanceLeave/workHours', params)
+// 获取申请记录
+export const getApplyRecordList = params => getAction('/attendance/kqFlowMainProcess/applyRecordList', params)
+// 获取申请记录分类
+export const getApplytypeList = params => getAction('/attendance/kqFlowMainProcess/typeList', params)
+// 申请记录撤销
+export const editApplyRecord = params => postAction('/attendance/kqFlowMainProcess/edit', params)
 
 // 获取全部部门树形数据
 export const getQueryTreeList = params => getAction('/sys/sysDepart/queryTreeList', params)

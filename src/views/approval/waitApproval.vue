@@ -26,7 +26,7 @@
       <div class="info-right">
         <template v-if="JSON.stringify(processInfo) !== '{}'">
           <div class="info-right-title">
-            公出申请详情
+            申请详情
           </div>
           <div class="info-right-content">
             <a-descriptions title="申请信息" :column="2">
@@ -77,27 +77,29 @@
             </a-descriptions>
             <a-divider />
 
-            <a-descriptions title="填写意见"> </a-descriptions>
-            <a-textarea placeholder="Basic usage" :rows="5" />
-            <div class="btn-container">
-              <a-button type="primary" size="large" style="margin-right: 25px;" @click="handlePass">
-                通过
-              </a-button>
-              <a-button
-                type="primary"
-                size="large"
-                style="margin-right: 25px;"
-                @click="
-                  () => {
-                    ApproverModalVisible = true
-                  }
-                "
-              >
-                通过并转交
-              </a-button>
-              <a-button size="large" @click="handleReject">
-                驳回
-              </a-button>
+            <div v-if="processInfo.examineStatus === '01'">
+              <a-descriptions title="填写意见"> </a-descriptions>
+              <a-textarea placeholder="Basic usage" :rows="5" />
+              <div class="btn-container">
+                <a-button type="primary" size="large" style="margin-right: 25px;" @click="handlePass">
+                  通过
+                </a-button>
+                <a-button
+                  type="primary"
+                  size="large"
+                  style="margin-right: 25px;"
+                  @click="
+                    () => {
+                      ApproverModalVisible = true
+                    }
+                  "
+                >
+                  通过并转交
+                </a-button>
+                <a-button size="large" @click="handleReject">
+                  驳回
+                </a-button>
+              </div>
             </div>
           </div>
         </template>
@@ -124,8 +126,8 @@ import ApproverModal from '../application/components/ApproverModal.vue'
 const examineStatus = {
   '01': '待审批',
   '02': '审批通过',
-  '03': '审批通过',
-  '09': '审批通过'
+  '03': '审批不通过',
+  '09': '撤销'
 }
 export default {
   components: { FilterForm, ApproverModal },
@@ -140,16 +142,17 @@ export default {
     }
   },
   created() {
-    this.getExamineListData()
+    this.getExamineListData({ type: '01' })
   },
   methods: {
     // 筛选查询回调
     submitCallback(params) {
       console.log('筛选参数', params)
+      this.getExamineListData({ type: '01', userName: params.name })
     },
     // 获取审批数据列表
-    async getExamineListData() {
-      let res = await getExamineList({ type: '01' })
+    async getExamineListData({ type, userName = '' }) {
+      let res = await getExamineList({ type, userName })
       console.log('审批列表', res)
       if (res.code === 200) {
         this.examineList = res.result

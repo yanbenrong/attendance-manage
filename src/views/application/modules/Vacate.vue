@@ -5,7 +5,7 @@
  * @Description: 请假表单 
  * @params: 
  * @Date: 2023-03-09 15:18:11
- * @LastEditTime: 2023-03-30 15:57:02
+ * @LastEditTime: 2023-03-31 10:44:29
 -->
 <template>
   <div class="vacate-form">
@@ -28,7 +28,10 @@
               查看各考勤专员邮箱
             </a-button>
           </div>
-          <div class="form-tip">{{ vacateType }}最小单位{{ vacateTypeTip[vacateType].minUnit }}</div>
+          <div class="form-tip">
+            {{ vacateType }}最小单位{{ vacateTypeTip[vacateType].minUnit }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span v-if="vacateType === '年假'">年假剩余 {{ annualLeaveInfo.residueHours }}小时</span>
+          </div>
         </div>
       </a-form-item>
       <a-form-item label="开始时间-结束时间" :colon="false">
@@ -101,12 +104,11 @@
 </template>
 
 <script>
-import { getBase64 } from '@/utils/attendanceUtils.js'
 import { vacateTypeTip, specialistMail } from './staticData'
 import { initDictOptions } from '@/components/dict/JDictSelectUtil'
 import JImageUpload from '@/components/jeecg/JImageUpload'
 import ApproverModal from '../components/ApproverModal.vue'
-import { attendanceLeave, getWorkHours } from '@/api/myAttendance.js'
+import { attendanceLeave, getWorkHours, getLeavePool } from '@/api/myAttendance.js'
 import { getFileAccessHttpUrl } from '@/api/manage'
 
 export default {
@@ -121,12 +123,14 @@ export default {
       drawerVisible: false, // 专员邮箱抽屉
       ApproverModalVisible: false, // 选择审批人弹窗
       formValue: {}, // 表单值
-      approverInfo: {} // 审批人信息
+      approverInfo: {}, // 审批人信息
+      annualLeaveInfo: {} // 假期池信息
     }
   },
   inject: ['closeCurrent'],
   created() {
     this.getLeaveTypeDict()
+    this.getHolidayResidue()
   },
   methods: {
     // 提交回调
@@ -164,7 +168,8 @@ export default {
         title: '提示',
         content: h => (
           <div style="color:#000;">
-            您当前剩余补休0.87500天，剩余年假5.00000天(其中去年结转5.00000天),为了保证您领薪的完整性，建议优先申请补休/年假电子流。
+            您当前剩余年假{this.annualLeaveInfo.residueHours}小时 (其中去年结转{this.annualLeaveInfo.restHours}
+            小时),为了保证您领薪的完整性，建议优先申请补休/年假电子流。
           </div>
         ),
         centered: true
@@ -215,6 +220,14 @@ export default {
         return newarr.join(',')
       }
       return ''
+    },
+    // 获取假期池
+    async getHolidayResidue() {
+      let res = await getLeavePool()
+      console.log('😍2023-03-13 假期池res', res)
+      if (res.code === 200) {
+        res.result.length > 0 && (this.annualLeaveInfo = res.result[0])
+      }
     },
     // 提交请假申请
     async submitAttendanceVacate() {

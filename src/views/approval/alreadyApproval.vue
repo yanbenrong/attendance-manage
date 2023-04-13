@@ -3,7 +3,7 @@
     <FilterForm @submit="submitCallback"></FilterForm>
     <div v-if="true" class="approval-info">
       <div class="info-left">
-        <div class="left-top">待审批 {{ examineList.length || 0 }}条</div>
+        <div class="left-top">已审批 {{ examineList.length || 0 }}条</div>
         <div class="left-scroll">
           <div
             v-for="i in examineList"
@@ -26,7 +26,7 @@
       <div class="info-right">
         <template v-if="JSON.stringify(processInfo) !== '{}'">
           <div class="info-right-title">
-            公出申请详情
+            申请详情
           </div>
           <div class="info-right-content">
             <a-descriptions title="申请信息" :column="2">
@@ -94,14 +94,14 @@
 
 <script>
 import FilterForm from './components/FilterForm.vue'
-import { getExamineList, getExamineInfoById, putExamine } from '@/api/myAttendance.js'
+import { getExamineList, getExamineInfoById } from '@/api/myAttendance.js'
 import ApproverModal from '../application/components/ApproverModal.vue'
 
 const examineStatus = {
   '01': '待审批',
   '02': '审批通过',
-  '03': '审批通过',
-  '09': '审批通过'
+  '03': '审批不通过',
+  '09': '撤销'
 }
 export default {
   components: { FilterForm, ApproverModal },
@@ -116,16 +116,17 @@ export default {
     }
   },
   created() {
-    this.getExamineListData()
+    this.getExamineListData({ type: '02' })
   },
   methods: {
     // 筛选查询回调
     submitCallback(params) {
       console.log('筛选参数', params)
+      this.getExamineListData({ type: '02', userName: params.name })
     },
     // 获取审批数据列表
-    async getExamineListData() {
-      let res = await getExamineList({ type: '02' })
+    async getExamineListData({ type, userName = '' }) {
+      let res = await getExamineList({ type, userName })
       console.log('审批列表', res)
       if (res.code === 200) {
         this.examineList = res.result

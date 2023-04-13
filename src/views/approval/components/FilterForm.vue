@@ -5,14 +5,14 @@
  * @Description: 
  * @params: 
  * @Date: 2023-03-21 14:32:11
- * @LastEditTime: 2023-03-28 15:06:20
+ * @LastEditTime: 2023-03-31 10:27:38
 -->
 <template>
   <div class="filter-container">
     <div class="searchInput">
       <a-input-group size="large" compact style="width:400px;display: flex;margin-right: 50px;">
-        <a-select size="large" default-value="gh" style="width:150px" :options="inputSelectOption"> </a-select>
-        <a-input-search size="large" placeholder="请填写..." enter-button @search="onSearch" />
+        <a-select size="large" default-value="xm" style="width:150px" :options="inputSelectOption"> </a-select>
+        <a-input-search size="large" placeholder="请填写..." v-model="inputValue" enter-button @search="onSearch" />
       </a-input-group>
       <a-button
         v-if="false"
@@ -63,18 +63,19 @@ export default {
       form: this.$form.createForm(this, { name: 'advanced_search' }),
       isShowAdvanced: false,
       inputSelectOption: [
-        { value: 'gh', label: '工号' },
-        { value: 'xm', label: '姓名' },
-        { value: 'lsh', label: '流水号' },
-        { value: 'spr', label: '审批人' },
-        { value: 'sprgh', label: '审批人工号' },
-        { value: 'fqr', label: '发起人' }
-      ]
+        // { value: 'gh', label: '工号' },
+        { value: 'xm', label: '姓名' }
+        // { value: 'lsh', label: '流水号' },
+        // { value: 'spr', label: '审批人' },
+        // { value: 'sprgh', label: '审批人工号' },
+        // { value: 'fqr', label: '发起人' }
+      ],
+      inputValue: ''
     }
   },
   methods: {
     onSearch() {
-      this.$emit('submit', { name: 'xxx' })
+      this.$emit('submit', { name: this.inputValue })
     }
   }
 }
